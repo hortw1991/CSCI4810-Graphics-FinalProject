@@ -2,13 +2,9 @@
 
 let container;      	        // keeping here for easy access
 let scene, camera, renderer;    // Three.js rendering basics.
-let gun;                        // The gun, which can be "aimed" by the mouse.
-let gunbase;                    // The cylinder at the base of the gun; the gun is a child of this cylinder.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
-                                //        (in the local coordinate system of the gunbase).
-let gunRotateY = 0;             // Amount by which gun is rotated around the y-axis
-                                //    (carrying the camera with it).
+
 
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
@@ -40,27 +36,6 @@ function createWorld()
     ground.position.y = -1;
     scene.add(ground);
 
-    let gunmat = new THREE.MeshLambertMaterial({
-        color: 0xaaaaff
-    });
-    gun = new THREE.Mesh(new THREE.SphereGeometry(1.5,16,8),gunmat);
-    let barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.7,5,16), gunmat);
-    barrel.position.y = 2.5;
-    gun.add(barrel);
-    gunbase = new THREE.Mesh(new THREE.CylinderGeometry(3,3,0.5,32), gunmat);
-
-    let linegeom = new THREE.Geometry();
-    linegeom.vertices.push(new THREE.Vector3(0,0,0));
-    linegeom.vertices.push(new THREE.Vector3(0,100,0));
-    ray = new THREE.Line( linegeom, new THREE.LineBasicMaterial({
-        color: 0xffaa00,
-        linewidth: 3
-    }));
-
-    gunbase.add(ray);
-    gunbase.add(camera);
-    gunbase.add(gun);
-    scene.add(gunbase);
 
 } // end createWorld
 
@@ -131,10 +106,7 @@ function doMouseMove(evt)
     // mouse was moved to (x,y)
     let rotZ = 5*Math.PI/6 * (window.innerWidth/2 - x)/window.innerWidth;
     let rotX = 5*Math.PI/6 * (y - window.innerHeight/2)/window.innerHeight;
-    gun.rotation.set(rotX,0,rotZ);
     let rcMatrix = new THREE.Matrix4(); // The matrix representing the gun rotation,
-                                        //    so we can apply it to the ray direction.
-    rcMatrix.makeRotationFromEuler(gun.rotation); // Get the rotation, as a matrix.
     rayVector = new THREE.Vector3(0,1,0);  // Untransformed rayVector
     rayVector.applyMatrix4(rcMatrix);  // Apply the rotation matrix
     ray.geometry.vertices[1].set(rayVector.x*100,rayVector.y*100,rayVector.z*100);
@@ -146,7 +118,8 @@ function doKeyDown( event )
     let fn = "[doKeyDown]: ";
     console.log( fn + "Key pressed with code " + event.key );
     // https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-
+/*
+    //this will be for movement of player model
     const code = event.key;
     // console.log("Key pressed with code " + code);
     let rot = 0;
@@ -158,14 +131,7 @@ function doKeyDown( event )
     {
         rot = -0.02;
     }
-    if( event.shiftKey )                                  // 'shift'
-        rot *= 5;
-    if( rot !== 0 )
-    {
-        gunRotateY += rot;
-        gunbase.rotation.y = gunRotateY;
-        event.stopPropagation();          // *** MH
-    }
+ */
 }
 
 //--------------------------- animation support -----------------------------------
