@@ -5,12 +5,15 @@ let scene, camera, renderer;    // Three.js rendering basics.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
-
+let player;                     //player model
+let cameraControls;
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
  *  and adds them to the scene.  A light that shines from the direction of the
  *  camera's view is also bundled with the camera and added to the scene.
  */
+
+
 function createWorld()
 {
     renderer.setClearColor( 0 );  // black background
@@ -35,10 +38,77 @@ function createWorld()
     ground.rotation.x = -Math.PI/2;
     ground.position.y = -1;
     scene.add(ground);
-
+    player = playerCreation();
 
 } // end createWorld
+/**
+ * This is the function used to create the player model
+ */
+function playerCreation()
+{
+    //player head
+    const headWidth = 2;
+    const headHeight = 2;
+    const headDepth = 2;
+    const headGeometry = new THREE.BoxGeometry( headWidth, headHeight, headDepth);
 
+    const headMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+
+    let head = new THREE.Mesh(headGeometry, headMaterial);
+    scene.add(head);
+    head.position.y = 7;
+
+    //player body
+    const bodyWidth = 3;
+    const bodyHeight = 4;
+    const bodyDepth = 1;
+
+    const bodyGeometry = new THREE.BoxGeometry( bodyWidth, bodyHeight, bodyDepth );
+    const bodyMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+
+    let body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    head.add(body);
+    body.position.y = -3;
+
+    //arms
+    const armWidth = 1;
+    const armHeight = 4;
+    const armDepth = 1;
+
+    let armGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
+    let armMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+
+    let armLeft = new THREE.Mesh(armGeometry, armMaterial);
+    let armRight = new THREE.Mesh(armGeometry, armMaterial);
+
+    body.add(armLeft);
+    armLeft.position.x = -1.5;
+    body.add(armRight);
+    armRight.position.x = 1.5;
+
+    //legs
+    const legWidth = 1.49;
+    const legHeight = 4;
+    const legDepth = 1;
+
+    let legGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
+    let legMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+
+    let legLeft = new THREE.Mesh(legGeometry, legMaterial);
+    let legRight = new THREE.Mesh(legGeometry, legMaterial);
+
+    body.add(legLeft);
+    legLeft.position.y = -3;
+    legLeft.position.x = 0.75;
+
+    body.add(legRight);
+    legRight.position.y = -3;
+    legRight.position.x = -0.75;
+
+}//end of playerCreation
+
+
+//added to move camera temporarily
 
 /**
  *  When an animation is in progress, this function is called just before rendering each
@@ -100,7 +170,7 @@ function doMouseMove(evt)
 {
     let fn = "[doMouseMove]: ";
     console.log( fn );
-
+/*
     let x = evt.clientX;
     let y = evt.clientY;
     // mouse was moved to (x,y)
@@ -111,27 +181,29 @@ function doMouseMove(evt)
     rayVector.applyMatrix4(rcMatrix);  // Apply the rotation matrix
     ray.geometry.vertices[1].set(rayVector.x*100,rayVector.y*100,rayVector.z*100);
     ray.geometry.verticesNeedUpdate = true;
+*/
 }
+
 
 function doKeyDown( event )
 {
     let fn = "[doKeyDown]: ";
     console.log( fn + "Key pressed with code " + event.key );
     // https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-/*
+
     //this will be for movement of player model
     const code = event.key;
     // console.log("Key pressed with code " + code);
     let rot = 0;
     if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
     {
-        rot = 0.02;
+        camera.rotate.y = (Math.PI/2);
     }
     else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
     {
         rot = -0.02;
     }
- */
+
 }
 
 //--------------------------- animation support -----------------------------------
@@ -189,6 +261,7 @@ function init()
     createWorld();
 
     clock = new THREE.Clock(); // For keeping time during the animation.
+
 
     requestAnimationFrame(doFrame);  // Start the animation.
 
