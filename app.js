@@ -9,7 +9,13 @@ let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
 let player, target, head;       //player model
+let headBBoxHelper, headBBox;
+let walls = [];                 //used for checking wall collisions
+
 let cameraControls;
+
+let reverseOnly = false;
+
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
  *  and adds them to the scene.  A light that shines from the direction of the
@@ -27,10 +33,10 @@ function createWorld()
     let light = new THREE.DirectionalLight();
     light.position.set( 0, 0, 1);
 
+    // Camera distance controls
     camera.position.set(0, 20, 80);
     camera.rotation.x = -Math.PI/10; //camera looks down a bit
-    camera.add(light);
-    
+    // camera.add(light);
     scene.add(new THREE.DirectionalLight(0x808080));
 
     let ground = new THREE.Mesh(
@@ -50,8 +56,23 @@ function createWorld()
     target = new THREE.Object3D;
     head.add(target);
     head.add(camera);
+    
+    /* Setup head BBOx for collision detection.  Will likely need addition boxes for smaller objects unless floating. */
+    headBBoxHelper = new THREE.BoxHelper(head, 0x00ff00);
+    scene.add(headBBoxHelper)
+    headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
+
+    /* TEST CODE */
+    let g = new THREE.BoxGeometry(5, 20, 5);
+    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let c = new THREE.Mesh(g, m);
+    c.position.z = -20;
+    scene.add(c);
+    walls.push(c);
 
 } // end createWorld
+
+
 /**
  * This is the function used to create the player model
  */
@@ -119,7 +140,39 @@ function playerCreation()
 }//end of playerCreation
 
 
-//added to move camera temporarily
+/**
+ * Checks for collisions against the walls of the maze.
+ */
+function checkWallCollisions()
+{
+    headBBoxHelper.update();
+    headBBox.setFromObject(headBBoxHelper);
+
+    for (let i = 0; i < walls.length; i++)
+    {
+        let wallBBoxHelper = new THREE.BoxHelper(walls[i], 'red');
+        scene.add(wallBBoxHelper);
+        // let wallBBox = new THREE.Box3();
+        // wallBBox.setFromObject(wallBBoxHelper);
+        head.updateMatrixWorld();
+        walls[i].updateMatrixWorld();
+
+        let headPos = head.geometry.boundingBox.clone();
+        headPos.applyMatrix4(head.matrixWorld);
+        let wallPos = walls[i].geometry.boundingBox.clone();
+        wallPos.applyMatrix4(walls[i].matrixWorld);
+
+        if (headPos.intersectsBox(wallPos))
+        {
+            console.log("intersecting");
+            reverseOnly = true;
+        }
+
+        // console.log(headBBox.intersectsBox(wallBBox))
+    }
+
+}  // checkWallCollisions
+
 
 /**
  *  When an animation is in progress, this function is called just before rendering each
@@ -232,6 +285,7 @@ let clock;  // Keeps track of elapsed time of animation.
 function doFrame()
 {
     updateForFrame();
+    checkWallCollisions();
     render();
     requestAnimationFrame(doFrame);
 }
