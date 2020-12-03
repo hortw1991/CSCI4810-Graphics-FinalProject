@@ -1,11 +1,14 @@
 "use strict";
 
+import * as THREE from 'https://unpkg.com/three@0.120.0/build/three.module.js';
+
+
 let container;      	        // keeping here for easy access
 let scene, camera, renderer;    // Three.js rendering basics.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
-let player;                     //player model
+let player, target, head;       //player model
 let cameraControls;
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
@@ -18,14 +21,16 @@ function createWorld()
 {
     renderer.setClearColor( 0 );  // black background
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(20, window.innerWidth/window.innerHeight, 1, 1000);
 
     /* Add the camera and a light to the scene, linked into one object. */
     let light = new THREE.DirectionalLight();
     light.position.set( 0, 0, 1);
-    camera.position.set(0, 40, 100);
-    camera.rotation.x = -Math.PI/9; //camera looks down a bit
+
+    camera.position.set(0, 20, 80);
+    camera.rotation.x = -Math.PI/10; //camera looks down a bit
     camera.add(light);
+    
     scene.add(new THREE.DirectionalLight(0x808080));
 
     let ground = new THREE.Mesh(
@@ -35,10 +40,16 @@ function createWorld()
             map: makeTexture("resources/wall-grey.jpg")
         })
     );
+
     ground.rotation.x = -Math.PI/2;
     ground.position.y = -1;
     scene.add(ground);
     player = playerCreation();
+
+    /* Attach camera to a new 3D mesh to track the player */
+    target = new THREE.Object3D;
+    head.add(target);
+    head.add(camera);
 
 } // end createWorld
 /**
@@ -54,7 +65,7 @@ function playerCreation()
 
     const headMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
-    let head = new THREE.Mesh(headGeometry, headMaterial);
+    head = new THREE.Mesh(headGeometry, headMaterial);
     scene.add(head);
     head.position.y = 7;
 
@@ -194,14 +205,22 @@ function doKeyDown( event )
     //this will be for movement of player model
     const code = event.key;
     // console.log("Key pressed with code " + code);
-    let rot = 0;
+    let rot = 0.1;
     if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
     {
-        camera.rotate.y = (Math.PI/2);
+        head.rotateY(Math.PI/50);
     }
     else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
     {
-        rot = -0.02;
+        head.rotateY(-Math.PI/50);
+    }
+    else if (code == 'w' || code == 'ArrowUp')
+    {
+        head.translateZ(-1);
+    }
+    else if (code == 's' || code == 'ArrowDown')
+    {
+        head.translateZ(1);
     }
 
 }
