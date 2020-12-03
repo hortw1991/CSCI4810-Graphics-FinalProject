@@ -34,7 +34,7 @@ function createWorld()
     scene.add(new THREE.DirectionalLight(0x808080));
 
     let ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(100, 100),
+        new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
             color: "white",
             map: makeTexture("resources/wall-grey.jpg")
