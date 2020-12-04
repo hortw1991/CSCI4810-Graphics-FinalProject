@@ -9,6 +9,7 @@ let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
 let player, target, head;       //player model
+let torch;                      //torch model (set as a single torch first)
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
 
@@ -48,7 +49,9 @@ function createWorld()
     ground.rotation.x = -Math.PI/2;
     ground.position.y = -1;
     scene.add(ground);
+
     player = playerCreation();
+    torch = torchCreation();
 
     /* Attach camera to a new 3D mesh to track the player */
     target = new THREE.Object3D;
@@ -150,7 +153,86 @@ function playerCreation()
 
 }//end of playerCreation
 
+function torchCreation()
+{
+    const handleWidth = 0.5;
+    const handleHeight = 3.5;
+    const handleDepth = 0.5;
 
+    const handleGeometry = new THREE.BoxGeometry( handleWidth, handleHeight, handleDepth);
+    const handleMaterial = new THREE.MeshPhongMaterial ( {color: 0x6F4E16} );
+
+    let handle = new THREE.Mesh(handleGeometry, handleMaterial);
+
+    scene.add(handle);
+    handle.position.z = 10;
+
+    const cubeWidth = 1;
+    const cubeHeight = 1;
+    const cubeDepth = 1;
+
+    const flameGeometry = new THREE.BoxGeometry( cubeWidth, cubeHeight, cubeDepth);
+    const flameMaterial = glowRedShader();
+
+    let flameRed = new THREE.Mesh(flameGeometry, flameMaterial);
+    handle.add(flameRed);
+    flameRed.position.y = 1.75;
+
+}
+
+function glowRedShader()
+{
+    let     vShader = document.getElementById('vGlow').innerHTML;
+    let     fShader = document.getElementById('fGlow').innerHTML;
+    let     itemMaterial = new THREE.ShaderMaterial({
+        uniforms:
+            {
+
+                "c": {type: "f", value: 1.0},
+                "p": {type: "f", value: 1.4},
+                glowColor:{type: "c", value: new THREE.Color(0xF35A31)},
+                vVector:{type: "v3", value: camera.position},
+
+            },
+
+        vertexShader:   vShader,
+        fragmentShader: fShader,
+        side: THREE.FrontSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+
+    });
+
+    return itemMaterial;
+
+}
+
+function glowYellowShader()
+{
+    let     vShader = document.getElementById('vGlow').innerHTML;
+    let     fShader = document.getElementById('fGlow').innerHTML;
+    let     itemMaterial = new THREE.ShaderMaterial({
+        uniforms:
+            {
+
+                "c": {type: "f", value: 1.0},
+                "p": {type: "f", value: 1.4},
+                glowColor:{type: "c", value: new THREE.Color(0xFAF23A)},
+                vVector:{type: "v3", value: camera.position},
+
+            },
+
+        vertexShader:   vShader,
+        fragmentShader: fShader,
+        side: THREE.FrontSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+
+    });
+
+    return itemMaterial;
+
+}
 /**
  * Checks for collisions against the walls of the maze.
  */
