@@ -117,11 +117,11 @@ function playerCreation()
     armRight.position.x = 1.5;
 
     //legs
-    const legWidth = 1.49;
+    const legWidth = 1.3;
     const legHeight = 4;
     const legDepth = 1;
 
-    let legGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
+    let legGeometry = new THREE.BoxGeometry( legWidth, legHeight, legDepth );
     let legMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
     let legLeft = new THREE.Mesh(legGeometry, legMaterial);
