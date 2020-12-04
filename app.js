@@ -68,6 +68,19 @@ function createWorld()
     scene.add(c);
     walls.push(c);
 
+    {
+        const loader = new THREE.CubeTextureLoader();
+        const texture = loader.load([
+            'resources/skybox/posx.jpg',
+            'resources/skybox/negx.jpg',
+            'resources/skybox/posy.jpg',
+            'resources/skybox/negy.jpg',
+            'resources/skybox/posz.jpg',
+            'resources/skybox/negz.jpg',
+        ]);
+        scene.background = texture;
+    }
+
 } // end createWorld
 
 
