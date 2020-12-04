@@ -14,8 +14,6 @@ let walls = [];                 //used for checking wall collisions
 
 let cameraControls;
 
-let reverseOnly = false;
-
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
  *  and adds them to the scene.  A light that shines from the direction of the
@@ -58,12 +56,12 @@ function createWorld()
     head.add(camera);
     
     /* Setup head BBOx for collision detection.  Will likely need addition boxes for smaller objects unless floating. */
-    headBBoxHelper = new THREE.BoxHelper(head, 0x00ff00);
+    headBBoxHelper = new THREE.BoxHelper(head, 'white');
     scene.add(headBBoxHelper)
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
     /* TEST CODE */
-    let g = new THREE.BoxGeometry(5, 20, 5);
+    let g = new THREE.BoxGeometry(40, 40, 20);
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
     let c = new THREE.Mesh(g, m);
     c.position.z = -20;
@@ -143,7 +141,7 @@ function playerCreation()
 /**
  * Checks for collisions against the walls of the maze.
  */
-function checkWallCollisions()
+function checkWallCollisions(x, y, z)
 {
     headBBoxHelper.update();
     headBBox.setFromObject(headBBoxHelper);
@@ -159,14 +157,16 @@ function checkWallCollisions()
 
         let headPos = head.geometry.boundingBox.clone();
         headPos.applyMatrix4(head.matrixWorld);
+        headPos.applyMatrix4(new THREE.Matrix4().makeTranslation(x,y,z))
+
         let wallPos = walls[i].geometry.boundingBox.clone();
         wallPos.applyMatrix4(walls[i].matrixWorld);
 
         if (headPos.intersectsBox(wallPos))
         {
-            console.log("intersecting");
-            reverseOnly = true;
+            return true;
         }
+        return false;
 
         // console.log(headBBox.intersectsBox(wallBBox))
     }
@@ -230,6 +230,7 @@ function doMouseDown(evt)
     console.log("Clicked mouse at " + x + "," + y);
 }
 
+
 function doMouseMove(evt)
 {
     let fn = "[doMouseMove]: ";
@@ -251,8 +252,8 @@ function doMouseMove(evt)
 
 function doKeyDown( event )
 {
-    let fn = "[doKeyDown]: ";
-    console.log( fn + "Key pressed with code " + event.key );
+    // let fn = "[doKeyDown]: ";
+    // console.log( fn + "Key pressed with code " + event.key );
     // https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 
     //this will be for movement of player model
@@ -261,20 +262,55 @@ function doKeyDown( event )
     let rot = 0.1;
     if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
     {
-        head.rotateY(Math.PI/50);
+        head.rotateY(Math.PI/25);
+        headBBoxHelper.update();
     }
     else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
     {
-        head.rotateY(-Math.PI/50);
+        head.rotateY(-Math.PI/25);
+        headBBoxHelper.update();
     }
+    /* These alter how close you can get to the maze */
     else if (code == 'w' || code == 'ArrowUp')
     {
-        head.translateZ(-1);
+        if (checkWallCollisions(0, 0, -1.5) || checkWallCollisions(1, 0, 0) || checkWallCollisions(-1, 0, 0))
+        {
+            for (let i = 0 ; i < 20; i++)
+            {
+                head.translateZ(0.25);
+            }
+        }
+        else 
+        {
+            head.translateZ(-1);
+        }
     }
-    else if (code == 's' || code == 'ArrowDown')
+    else if (code == 'q')
     {
-        head.translateZ(1);
+        if (checkWallCollisions(0, 0, -2.5) || checkWallCollisions(1, 0, 0) || checkWallCollisions(-1, 0, 0))
+        {
+            for (let i = 0 ; i < 20; i++)
+            {
+                head.translateZ(0.25);
+            }
+        }
+        else 
+        {
+            head.translateZ(-2);
+        }
     }
+    // else if (code == 's' || code == 'ArrowDown')
+    // {    
+    //     if (checkWallCollisions(-4))
+    //     {
+    //         head.translateZ(-2);
+    //         console.log('Cannot move backwards')
+    //     }
+    //     else 
+    //     {
+    //         head.translateZ(1);
+    //     }
+    // }
 
 }
 
@@ -285,7 +321,7 @@ let clock;  // Keeps track of elapsed time of animation.
 function doFrame()
 {
     updateForFrame();
-    checkWallCollisions();
+    // checkWallCollisions();
     render();
     requestAnimationFrame(doFrame);
 }
