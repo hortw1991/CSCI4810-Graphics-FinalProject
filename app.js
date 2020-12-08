@@ -172,10 +172,19 @@ function torchCreation()
     const cubeDepth = 1;
 
     const flameGeometry = new THREE.BoxGeometry( cubeWidth, cubeHeight, cubeDepth);
-    const flameMaterial = glowRedShader();
+    const flameRedMaterial = glowRedShader();
 
-    let flameRed = new THREE.Mesh(flameGeometry, flameMaterial);
+    let flameRed = new THREE.Mesh(flameGeometry, flameRedMaterial);
     handle.add(flameRed);
+
+    const flameYellMaterial = glowYellowShader();
+    let flameYell = new THREE.Mesh(flameGeometry, flameYellMaterial);
+    handle.add(flameYell);
+
+    flameYell.position.y = 1.75;
+    flameYell.rotation.y = 3*(Math.PI)/2;
+    flameYell.rotation.x = Math.sin(2);
+    flameYell.rotation.z = -Math.sin(2);
     flameRed.position.y = 1.75;
 
 }
@@ -217,7 +226,7 @@ function glowYellowShader()
 
                 "c": {type: "f", value: 1.0},
                 "p": {type: "f", value: 1.4},
-                glowColor:{type: "c", value: new THREE.Color(0xFAF23A)},
+                glowColor:{type: "c", value: new THREE.Color(0xE2EF17)},
                 vVector:{type: "v3", value: camera.position},
 
             },
