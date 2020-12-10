@@ -285,6 +285,16 @@ function checkWallCollisions(x, y, z)
 function updateForFrame()
 {
     let time = clock.getElapsedTime(); // time, in seconds, since clock was created
+    let timeFloor = Math.floor(time); //for testing timer going up
+    let timeCeiling = Math.ceil(time); //for the count down
+
+    /**
+     * For this section this is where we are going transfer
+     * time left in the game/progression to the player
+     * so that they can see a count down
+     **/
+
+    document.getElementById("timeLeft").innerHTML = "" + timeFloor;
 }
 
 
