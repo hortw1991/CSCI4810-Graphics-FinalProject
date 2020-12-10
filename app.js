@@ -13,6 +13,7 @@ let torch;                      //torch model (set as a single torch first)
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
 
+let collision = 0;
 let cameraControls;
 
 /**
@@ -268,6 +269,11 @@ function checkWallCollisions(x, y, z)
 
         if (headPos.intersectsBox(wallPos))
         {
+            /**
+             * set up so if you run into anything the torch collection goes up
+             *  needs to be set up for the torch system.
+             * **/
+            collision++;
             return true;
         }
         return false;
@@ -295,6 +301,7 @@ function updateForFrame()
      **/
 
     document.getElementById("timeLeft").innerHTML = "" + timeFloor;
+    document.getElementById("collected").innerHTML = "" + collision;
 }
 
 
