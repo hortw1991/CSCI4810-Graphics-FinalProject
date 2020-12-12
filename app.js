@@ -57,8 +57,9 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 20, 80);
+    camera.position.set(0, 5, 80);
     camera.rotation.x = -Math.PI/10; //camera looks down a bit
+    camera.lookAt( 0, 3, 0 );
     head.add(target);
     head.add(camera);
   
@@ -72,16 +73,16 @@ function createWorld()
 
 
     
-        const loader = new THREE.CubeTextureLoader();
-        const texture = loader.load([
-            'resources/skybox/posx.jpg',
-            'resources/skybox/negx.jpg',
-            'resources/skybox/posy.jpg',
-            'resources/skybox/negy.jpg',
-            'resources/skybox/posz.jpg',
-            'resources/skybox/negz.jpg',
-        ]);
-        scene.background = texture;
+    const loader = new THREE.CubeTextureLoader();
+    const texture = loader.load([
+        'resources/skybox/posx.jpg',
+        'resources/skybox/negx.jpg',
+        'resources/skybox/posy.jpg',
+        'resources/skybox/negy.jpg',
+        'resources/skybox/posz.jpg',
+        'resources/skybox/negz.jpg',
+    ]);
+    scene.background = texture;
     
 
 } // end createWorld
@@ -89,15 +90,37 @@ function createWorld()
 
 function drawCanvas()
 {
-    const lineMaterial = new THREE.LineBasicMaterial( {color: "orange"});
-    const points = [];
-    points.push( new THREE.Vector3( -50, -1, -10 ));
-    // points.push( new THREE.Vector3( 0, -1, 0 ));
-    points.push( new THREE.Vector3( 50, -1, 10 ));
-    const lineGeometry = new THREE.BufferGeometry().setFromPoints ( points );
+    // const lineMaterial = new THREE.LineBasicMaterial( {color: "orange"});
+    // const points = [];
+    // points.push( new THREE.Vector3( -100, -1, - ));
+    // // points.push( new THREE.Vector3( 0, -1, 0 ));
+    // points.push( new THREE.Vector3( 100, -1, 100 ));
+    // const lineGeometry = new THREE.BufferGeometry().setFromPoints ( points );
 
-    const line = new THREE.Line( lineGeometry, lineMaterial );
-    scene.add(line);
+    // const line = new THREE.Line( lineGeometry, lineMaterial );
+    // scene.add(line);
+
+    const vertices = [];
+
+for ( let i = 0; i < 10000; i ++ ) {
+
+	const x = THREE.MathUtils.randFloatSpread( 2000 );
+	const y = THREE.MathUtils.randFloatSpread( 5 );
+	const z = THREE.MathUtils.randFloatSpread( 2000 );
+
+	vertices.push( x, y, z );
+
+}
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+const material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+const points = new THREE.Points( geometry, material );
+
+scene.add( points );
+
 }
 
 
@@ -430,9 +453,9 @@ function changeCamera()
 {
     if (overview)
     {
-        overview = false;
-        camera.position.set(0, 20, 80);
+        camera.position.set(0, 5, 80);
         camera.rotation.x = -Math.PI/10; //camera looks down a bit
+        camera.lookAt( 0, 3, 0 )
     }
     else
     {
