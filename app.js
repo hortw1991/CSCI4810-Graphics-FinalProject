@@ -453,6 +453,7 @@ function changeCamera()
 {
     if (overview)
     {
+        overview = false;
         camera.position.set(0, 5, 80);
         camera.rotation.x = -Math.PI/10; //camera looks down a bit
         camera.lookAt( 0, 3, 0 )
