@@ -66,15 +66,10 @@ function createWorld()
     scene.add(headBBoxHelper)
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
-    /* TEST CODE */
-    let g = new THREE.BoxGeometry(40, 40, 20);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    let c = new THREE.Mesh(g, m);
-    c.position.z = -20;
-    scene.add(c);
-    walls.push(c);
+    createOuterWalls();
 
-    {
+
+    
         const loader = new THREE.CubeTextureLoader();
         const texture = loader.load([
             'resources/skybox/posx.jpg',
@@ -85,9 +80,51 @@ function createWorld()
             'resources/skybox/negz.jpg',
         ]);
         scene.background = texture;
-    }
+    
 
 } // end createWorld
+
+
+/**
+ * Adds a boundary wall around the outside
+ */
+function createOuterWalls()
+{
+    // Overview for testing purposes
+    changeCamera();
+    let g = new THREE.BoxGeometry(40, 40, 3);
+    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let c1 = new THREE.Mesh(g, m);
+    c1.position.z = -20;
+    scene.add(c1);
+    walls.push(c1);
+
+    // Clone all boundaries off that boundary
+    let northBoundary = c1.clone();
+    northBoundary.position.z = -100;
+    northBoundary.scale.x = 5;
+    northBoundary.scale.y = 1;
+    northBoundary.scale.z = 1;
+    scene.add(northBoundary);
+    walls.push(northBoundary);
+
+    let southBoundary = northBoundary.clone();
+    southBoundary.position.z = 100;
+    scene.add(southBoundary);
+    walls.push(southBoundary);
+
+    let eastBoundary = northBoundary.clone();
+    eastBoundary.position.x = 100;
+    eastBoundary.position.z = 0;
+    eastBoundary.rotateY(Math.PI/2);
+    scene.add(eastBoundary);
+    walls.push(eastBoundary);
+
+    let westBoundary = eastBoundary.clone();
+    westBoundary.position.x = -100;
+    scene.add(westBoundary);
+    walls.push(westBoundary)
+}
 
 
 /**
@@ -255,6 +292,7 @@ function checkWallCollisions(x, y, z)
 
     for (let i = 0; i < walls.length; i++)
     {
+        // console.log(walls[i]);
         let wallBBoxHelper = new THREE.BoxHelper(walls[i], 'red');
         scene.add(wallBBoxHelper);
         // let wallBBox = new THREE.Box3();
@@ -278,11 +316,13 @@ function checkWallCollisions(x, y, z)
             collision++;
             return true;
         }
-        return false;
+        scene.remove(wallBBoxHelper);
+        // return false;
 
         // console.log(headBBox.intersectsBox(wallBBox))
     }
 
+    return false;
 }  // checkWallCollisions
 
 
@@ -353,7 +393,7 @@ function changeCamera()
     else
     {
         overview = true;
-        camera.position.set(0, 500, 0);
+        camera.position.set(0, 600, 0);
         camera.lookAt(0, 0, 0);
     }
 }
