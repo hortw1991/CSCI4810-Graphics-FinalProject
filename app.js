@@ -41,7 +41,7 @@ function createWorld()
         new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
             color: "white",
-            map: makeTexture("resources/wall-grey.jpg")
+            map: makeTexture("resources/spookyGround.png")
         })
     );
 
