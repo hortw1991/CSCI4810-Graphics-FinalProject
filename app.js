@@ -15,6 +15,7 @@ let walls = [];                 //used for checking wall collisions
 
 let collision = 0;
 let cameraControls;
+let overview = false;
 
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
@@ -33,9 +34,6 @@ function createWorld()
     let light = new THREE.DirectionalLight();
     light.position.set( 0, 0, 1);
 
-    // Camera distance controls
-    camera.position.set(0, 20, 80);
-    camera.rotation.x = -Math.PI/10; //camera looks down a bit
     // camera.add(light);
     scene.add(new THREE.DirectionalLight(0x808080));
 
@@ -55,10 +53,14 @@ function createWorld()
     torch = torchCreation();
 
     /* Attach camera to a new 3D mesh to track the player */
-    target = new THREE.Object3D;
+    target = new THREE.Object3D;  // Could be used to track/follow the player 
+
+    // Camera distance controls
+    camera.position.set(0, 20, 80);
+    camera.rotation.x = -Math.PI/10; //camera looks down a bit
     head.add(target);
     head.add(camera);
-    
+  
     /* Setup head BBOx for collision detection.  Will likely need addition boxes for smaller objects unless floating. */
     headBBoxHelper = new THREE.BoxHelper(head, 'white');
     scene.add(headBBoxHelper)
@@ -340,6 +342,23 @@ function makeTexture( imageURL, material )
 }
 
 
+function changeCamera() 
+{
+    if (overview)
+    {
+        overview = false;
+        camera.position.set(0, 20, 80);
+        camera.rotation.x = -Math.PI/10; //camera looks down a bit
+    }
+    else
+    {
+        overview = true;
+        camera.position.set(0, 500, 0);
+        camera.lookAt(0, 0, 0);
+    }
+}
+
+
 //----------------------------- mouse and key support -------------------------------
 function doMouseDown(evt)
 {
@@ -419,6 +438,10 @@ function doKeyDown( event )
         {
             head.translateZ(-2);
         }
+    }
+    else if (code == '=')
+    {
+        changeCamera();
     }
     // else if (code == 's' || code == 'ArrowDown')
     // {    
