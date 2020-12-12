@@ -92,7 +92,7 @@ function createOuterWalls()
 {
     // Overview for testing purposes
     changeCamera();
-    let g = new THREE.BoxGeometry(40, 40, 3);
+    let g = new THREE.BoxGeometry(40, 20, 1);
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
     let c1 = new THREE.Mesh(g, m);
     c1.position.z = -20;
