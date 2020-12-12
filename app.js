@@ -16,6 +16,7 @@ let walls = [];                 //used for checking wall collisions
 let collision = 0;
 let cameraControls;
 let overview = false;
+let mousePos;
 
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
@@ -67,6 +68,7 @@ function createWorld()
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
     createOuterWalls();
+    drawCanvas()
 
 
     
@@ -85,6 +87,47 @@ function createWorld()
 } // end createWorld
 
 
+function drawCanvas()
+{
+    const lineMaterial = new THREE.LineBasicMaterial( {color: "orange"});
+    const points = [];
+    points.push( new THREE.Vector3( -50, -1, -10 ));
+    // points.push( new THREE.Vector3( 0, -1, 0 ));
+    points.push( new THREE.Vector3( 50, -1, 10 ));
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints ( points );
+
+    const line = new THREE.Line( lineGeometry, lineMaterial );
+    scene.add(line);
+}
+
+
+function getCanvas()
+{
+  const borderSize = 2;
+  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${4}px bold sans-serif`;
+  ctx.font = font;
+  // measure how long the name will be
+  const doubleBorderSize = borderSize * 2;
+  const width = 4;
+  const height = 4;
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
+ 
+  // need to set font again after resizing canvas
+  ctx.font = font;
+  ctx.textBaseline = 'top';
+ 
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = 'white';
+  ctx.fillText(borderSize, borderSize, borderSize);
+ 
+  return ctx.canvas;
+}
+
+
+
 /**
  * Adds a boundary wall around the outside
  */
@@ -92,6 +135,7 @@ function createOuterWalls()
 {
     // Overview for testing purposes
     changeCamera();
+    // Material that the rest are cloned off of
     let g = new THREE.BoxGeometry(40, 20, 1);
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
     let c1 = new THREE.Mesh(g, m);
@@ -400,23 +444,26 @@ function changeCamera()
 
 
 //----------------------------- mouse and key support -------------------------------
-function doMouseDown(evt)
-{
-    let fn = "[doMouseDown]: ";
-    console.log( fn );
 
-    let x = evt.clientX;
-    let y = evt.clientY;
-    console.log("Clicked mouse at " + x + "," + y);
+// Prints mouse click locations in the top down view
+function doMouseDown(event)
+{
+    let vector = new THREE.Vector3();
+    vector.set(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        - (event.clientY / window.innerHeight) * 2 + 1,
+        0
+    );
+    vector.unproject(camera);
+    console.log(vector);
 }
 
 
 function doMouseMove(evt)
 {
-    let fn = "[doMouseMove]: ";
-    console.log( fn );
 /*
-    let x = evt.clientX;
+    let fn = "[doMouseMove]: ";
+    console.log( fn )    let x = evt.clientX;
     let y = evt.clientY;
     // mouse was moved to (x,y)
     let rotZ = 5*Math.PI/6 * (window.innerWidth/2 - x)/window.innerWidth;
@@ -545,6 +592,8 @@ function init()
 
     // Create & Install Renderer ---------------------------------------
     createRenderer();
+    mousePos = new THREE.Vector2();
+
 
     window.addEventListener( 'resize', doResize );  // Set up handler for resize event
     document.addEventListener("keydown",doKeyDown);
