@@ -68,15 +68,14 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 5, 80);
+    camera.position.set(0, 1, 40);
     camera.rotation.x = -Math.PI/10; //camera looks down a bit
     camera.lookAt( 0, 3, 0 );
     head.add(target);
     head.add(camera);
   
-    /* Setup head BBOx for collision detection.  Will likely need addition boxes for smaller objects unless floating. */
+    /* Setup head BBOx for collision detection help */
     headBBoxHelper = new THREE.BoxHelper(head, 'white');
-    scene.add(headBBoxHelper)
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
     createOuterWalls();
@@ -95,6 +94,8 @@ function createWorld()
     
     //modelMovement();
 
+    
+
 } // end createWorld
 
 
@@ -108,7 +109,12 @@ function createOuterWalls()
     changeCamera();
     // Material that the rest are cloned off of
     let g = new THREE.BoxGeometry(40, 20, 1);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let tex = new THREE.TextureLoader().load('./resources/cornwall.jpg');
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(4, 1);
+    let m = new THREE.MeshBasicMaterial( { map: tex} );
+
     let c1 = new THREE.Mesh(g, m);
     c1.position.z = -20;
     // scene.add(c1);
@@ -147,13 +153,12 @@ function createOuterWalls()
     walls.push(test);
 }
 
-
+// Creates all non border walls.  These are custom placed, as it turns out
+// that completely randomizing them with our self-made collision system can
+// create unwinnable situations where the gap is too small to get through.
 function createHorizontalWalls()
 {
-    // Material to clone into all wall shapes
-    // let g = new THREE.BoxGeometry(10, 20, 3);
-    // let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )\
-
+    // Material to clone into all wall shapes\
     let v = getWall(); v.rotateY(Math.PI/0);
     v.position.x = -50;
     v.position.z = -85;
@@ -333,7 +338,7 @@ function playerCreation()
     const headMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
     head = new THREE.Mesh(headGeometry, headMaterial);
-    scene.add(head);
+    scene.add(head);    
     head.position.y = 7;
 
     //player body
