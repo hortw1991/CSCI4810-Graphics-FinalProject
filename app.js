@@ -211,6 +211,75 @@ function createHorizontalWalls()
     let v6 = getWall();
     setWall(v6, -18, -13, true);
     v6.scale.x = 3
+
+    let v7 = getWall();
+    setWall(v7, -38, -30, true);
+    v7.scale.x = 2;
+
+    let h6 = getWall();
+    setWall(h6, 59, 80);
+    h6.scale.x = 5;
+
+    let h7 = getWall();
+    setWall(h7, -55, 51);
+    h7.scale.x = 6;
+
+    let h8 = getWall();
+    setWall(h8, -18, -9);
+    h8.scale.x = 8;
+
+    let v9 = getWall();
+    setWall(v9, -54, 50, true);
+    v9.scale.x = 7;
+
+    let v10 = getWall();
+    setWall(v10, 69, 26, true);
+    v10.scale.x = 5;
+
+    let v11 = getWall();
+    setWall(v11, 9, 40, true);
+    v11.scale.x = 8;
+
+    let h9 = getWall();
+    setWall(h9, -23, 29);
+    h9.scale.x = 4;
+
+    let h10 = getWall();
+    setWall(h10, -77, 34);
+    h10.scale.x = 4.5;
+
+    let v12 = getWall();
+    setWall(v12, -77, 67, true);
+    v12.scale.x = 3;
+
+    let h11 = getWall();
+    setWall(h11, 9, 65);
+    h11.scale.x = 4;
+
+    let v13 = getWall();
+    setWall(v13, -34, 73, true);
+    v13.scale.x = 2;
+
+    let v14 = getWall();
+    setWall(v14, 61, 89, true);
+    v14.scale.x = 2;
+
+    let h12 = getWall();
+    setWall(h12, 60, -14);
+    h12.scale.x = 4;
+
+    let h13 = getWall();
+    setWall(h13, 39, 39);
+    h13.scale.x = 3.5;
+
+    let v15 = getWall();
+    setWall(v15, 49, 60, true);
+    v15.scale.x = 2;
+
+    let h14 = getWall();
+    setWall(h14, -78, 17);
+    h14.scale.x = 2;
+    
 }
 
 
@@ -666,7 +735,7 @@ function doKeyDown( event )
         {
             for (let i = 0 ; i < 20; i++)
             {
-                head.translateZ(0.10);
+                head.translateZ(0.20);
             }
         }
         else 
@@ -697,7 +766,7 @@ function doKeyDown( event )
         if (checkWallCollisions())
         {
             for (let i = 0; i < 20; i++)
-                head.translateZ(-0.10);
+                head.translateZ(-0.20);
         }
         else 
         {
