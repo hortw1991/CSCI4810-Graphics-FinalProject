@@ -12,11 +12,13 @@ let player, target, head;       //player model
 let torch;                      //torch model (set as a single torch first)
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
+let collisions = [];
 
 let collision = 0;
 let cameraControls;
 let overview = false;
 let mousePos;
+let rot = Math.PI / 45;
 
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
@@ -69,8 +71,8 @@ function createWorld()
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
     createOuterWalls();
-    drawCanvas()
-
+    createHorizontalWalls();
+    // createVerticalWalls();
 
     
     const loader = new THREE.CubeTextureLoader();
@@ -88,68 +90,6 @@ function createWorld()
 } // end createWorld
 
 
-function drawCanvas()
-{
-    // const lineMaterial = new THREE.LineBasicMaterial( {color: "orange"});
-    // const points = [];
-    // points.push( new THREE.Vector3( -100, -1, - ));
-    // // points.push( new THREE.Vector3( 0, -1, 0 ));
-    // points.push( new THREE.Vector3( 100, -1, 100 ));
-    // const lineGeometry = new THREE.BufferGeometry().setFromPoints ( points );
-
-    // const line = new THREE.Line( lineGeometry, lineMaterial );
-    // scene.add(line);
-
-    const vertices = [];
-
-for ( let i = 0; i < 10000; i ++ ) {
-
-	const x = THREE.MathUtils.randFloatSpread( 2000 );
-	const y = THREE.MathUtils.randFloatSpread( 5 );
-	const z = THREE.MathUtils.randFloatSpread( 2000 );
-
-	vertices.push( x, y, z );
-
-}
-
-const geometry = new THREE.BufferGeometry();
-geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-
-const material = new THREE.PointsMaterial( { color: 0x888888 } );
-
-const points = new THREE.Points( geometry, material );
-
-scene.add( points );
-
-}
-
-
-function getCanvas()
-{
-  const borderSize = 2;
-  const ctx = document.createElement('canvas').getContext('2d');
-  const font =  `${4}px bold sans-serif`;
-  ctx.font = font;
-  // measure how long the name will be
-  const doubleBorderSize = borderSize * 2;
-  const width = 4;
-  const height = 4;
-  ctx.canvas.width = width;
-  ctx.canvas.height = height;
- 
-  // need to set font again after resizing canvas
-  ctx.font = font;
-  ctx.textBaseline = 'top';
- 
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = 'white';
-  ctx.fillText(borderSize, borderSize, borderSize);
- 
-  return ctx.canvas;
-}
-
-
 
 /**
  * Adds a boundary wall around the outside
@@ -163,8 +103,8 @@ function createOuterWalls()
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
     let c1 = new THREE.Mesh(g, m);
     c1.position.z = -20;
-    scene.add(c1);
-    walls.push(c1);
+    // scene.add(c1);
+    // walls.push(c1);
 
     // Clone all boundaries off that boundary
     let northBoundary = c1.clone();
@@ -191,6 +131,60 @@ function createOuterWalls()
     westBoundary.position.x = -100;
     scene.add(westBoundary);
     walls.push(westBoundary)
+
+    let test = c1.clone();
+    test.position.z = -85;
+    test.position.x = -80;
+    scene.add(test);
+    walls.push(test);
+    let test2 = test.clone();
+    // test2.rotateY(Math.PI / 180)
+    test.position.z = -86;
+    scene.add(test2);
+    walls.push(test2);
+}
+
+function createHorizontalWalls()
+{
+    // Material to clone into all wall shapes
+    let g = new THREE.BoxGeometry(10, 20, 3);
+    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let h = new THREE.Mesh(g, m);
+    h.adjustZ = true;  // needed to control the bounding box
+    h.position.z = -20;
+    scene.add(h);
+    walls.push(h);
+
+    // c1.rotateY(Math.PI/2);
+    // scene.add(c1);
+    // walls.push(c1)
+
+    // let c2 = c1.clone();
+    // c2.position.z = -20;
+    // scene.add(c2);
+    // // c2.rotateX((*Math.PI / 2));
+    // walls.push(c2);
+
+    // let wall1 = c1.clone();
+    // wall1.position.z = -90;
+    // wall1.position.x = -90
+    // scene.add(wall1);
+    // walls.push(wall1);
+}
+
+
+function createVerticalWalls()
+{
+    // Material to clone into all wall shapes
+    let g = new THREE.BoxGeometry(10, 40, 1);
+    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let v = new THREE.Mesh(g, m);
+    v.adjustZ = false;
+    v.position.z = -20;
+    v.rotateY(Math.PI/2);
+    scene.add(v);
+    walls.push(v);
+
 }
 
 
@@ -350,47 +344,41 @@ function glowYellowShader()
 
 }
 /**
- * Checks for collisions against the walls of the maze.
+ * Checks for collisions against the walls of the maze by preventing movements
+ * into walls.  If any collisions are detected from 0.5 z in FRONT of the head,
+ * it returns true and the movement key will automatically "bounce" the player
+ * in the opposite direction. 
+ * 
+ * Note: we need to check as if the player has already moved to prevent clipping
+ *       INTO the wall by adding one to the length of the ray angle 
  */
-function checkWallCollisions(x, y, z)
+function checkWallCollisions(rev=false)
 {
-    headBBoxHelper.update();
-    headBBox.setFromObject(headBBoxHelper);
+    // Create the head pos and "predict" its next location
+    let headPos = head.position.clone();
 
-    for (let i = 0; i < walls.length; i++)
+    // Loop through the head's vertices -> also covers backwards movement prediction
+    for (let i = 0; i < head.geometry.vertices.length; i++)
     {
-        // console.log(walls[i]);
-        let wallBBoxHelper = new THREE.BoxHelper(walls[i], 'red');
-        scene.add(wallBBoxHelper);
-        // let wallBBox = new THREE.Box3();
-        // wallBBox.setFromObject(wallBBoxHelper);
-        head.updateMatrixWorld();
-        walls[i].updateMatrixWorld();
+        // Create the raycasting angles and the raycaster
+        let localPos = head.geometry.vertices[i].clone();
+        let globalAngle = localPos.applyMatrix4(head.matrix);
+        let rayAngle = globalAngle.sub(head.position);
 
-        let headPos = head.geometry.boundingBox.clone();
-        headPos.applyMatrix4(head.matrixWorld);
-        headPos.applyMatrix4(new THREE.Matrix4().makeTranslation(x,y,z))
+        // Get any collisions
+        let raycaster = new THREE.Raycaster(headPos, rayAngle.clone().normalize());
+        let collisions = raycaster.intersectObjects(walls);
 
-        let wallPos = walls[i].geometry.boundingBox.clone();
-        wallPos.applyMatrix4(walls[i].matrixWorld);
-
-        if (headPos.intersectsBox(wallPos))
+        // Check if the the collision is TOUCHING the actual wall (or less)
+        if (collisions.length > 0)
         {
-            /**
-             * set up so if you run into anything the torch collection goes up
-             *  needs to be set up for the torch system.
-             * **/
-            collision++;
-            return true;
+            if (collisions[0].distance < rayAngle.length() + 1)
+            {
+                return true;
+            }
         }
-        scene.remove(wallBBoxHelper);
-        // return false;
-
-        // console.log(headBBox.intersectsBox(wallBBox))
     }
-
-    return false;
-}  // checkWallCollisions
+}
 
 
 /**
@@ -510,25 +498,25 @@ function doKeyDown( event )
     //this will be for movement of player model
     const code = event.key;
     // console.log("Key pressed with code " + code);
-    let rot = 0.1;
     if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
     {
-        head.rotateY(Math.PI/25);
+        head.rotateY(rot);
         headBBoxHelper.update();
     }
     else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
     {
-        head.rotateY(-Math.PI/25);
+        head.rotateY(-rot);
         headBBoxHelper.update();
     }
     /* These alter how close you can get to the maze */
     else if (code == 'w' || code == 'ArrowUp')
     {
-        if (checkWallCollisions(0, 0, -1.5) || checkWallCollisions(1, 0, 0) || checkWallCollisions(-1, 0, 0))
+        // if (checkWallCollisions(0, 0, -1.50) || checkWallCollisions(1.50, 0, 0) || checkWallCollisions(-1.50, 0, 0))
+        if (checkWallCollisions())
         {
             for (let i = 0 ; i < 20; i++)
             {
-                head.translateZ(0.25);
+                head.translateZ(0.10);
             }
         }
         else 
@@ -538,11 +526,11 @@ function doKeyDown( event )
     }
     else if (code == 'q')
     {
-        if (checkWallCollisions(0, 0, -2.5) || checkWallCollisions(1, 0, 0) || checkWallCollisions(-1, 0, 0))
+        if (checkWallCollisions())
         {
-            for (let i = 0 ; i < 20; i++)
+            for (let i = 0 ; i < 5; i++)
             {
-                head.translateZ(0.25);
+                head.translateZ(0.05);
             }
         }
         else 
@@ -554,18 +542,18 @@ function doKeyDown( event )
     {
         changeCamera();
     }
-    // else if (code == 's' || code == 'ArrowDown')
-    // {    
-    //     if (checkWallCollisions(-4))
-    //     {
-    //         head.translateZ(-2);
-    //         console.log('Cannot move backwards')
-    //     }
-    //     else 
-    //     {
-    //         head.translateZ(1);
-    //     }
-    // }
+    else if (code == 's' || code == 'ArrowDown')
+    {    
+        if (checkWallCollisions())
+        {
+            for (let i = 0; i < 20; i++)
+                head.translateZ(-0.10);
+        }
+        else 
+        {
+            head.translateZ(1);
+        }
+    }
 
 }
 
