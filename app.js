@@ -274,8 +274,7 @@ function modelMovement()
      let armMatrix = new THREE.Matrix4();
 
 if(rotX <= 1 && flip == false) {
-    console.log("rotX = " +rotX);
-    console.log("flip = "+flip);
+   //flipping right
     armMatrix.set(
         1, 0, 0, 0,
         0, Math.cos(-rotXTheta), Math.sin(-rotXTheta), 0,
@@ -285,7 +284,15 @@ if(rotX <= 1 && flip == false) {
 
     armRight.geometry.applyMatrix4(armMatrix);
     armRight.geometry.verticesNeedUpdate = true;
-    rotX += rotXTheta;
+    //flipping left
+    armMatrix.set(
+        1, 0, 0, 0,
+        0, Math.cos(rotXTheta), Math.sin(rotXTheta), 0,
+        0, -1 * (Math.sin(rotXTheta)), Math.cos(rotXTheta), 0,
+        0, 0, 0, 1
+    );
+    armLeft.geometry.applyMatrix4(armMatrix);
+    armLeft.geometry.verticesNeedUpdate = true;
 
         //now for the translations to appear connected
         //specifically the y and z translations
@@ -300,13 +307,24 @@ if(rotX <= 1 && flip == false) {
         armRight.geometry.applyMatrix4(armMatrix);
         armRight.geometry.verticesNeedUpdate = true;
 
+    armMatrix.set(
+        1, 0, 0, 0, //d messes with x translation
+        0, 1, 0,-transY, //h messes with y translation
+        0, 0, 1, -transZ, //p messes with z translation
+        0, 0,0,1
+
+    );
+
+    armLeft.geometry.applyMatrix4(armMatrix);
+    armLeft.geometry.verticesNeedUpdate = true;
+        rotX += rotXTheta;
     if(rotX > 1)
     {
         rotXTheta *= -1;
         transY *= -1;
         transZ *= -1;
         flip = true;
-        console.log("flip = "+flip);
+
     }
 }else if(rotX >= -1 && flip == true)
 {
@@ -319,7 +337,16 @@ if(rotX <= 1 && flip == false) {
 
     armRight.geometry.applyMatrix4(armMatrix);
     armRight.geometry.verticesNeedUpdate = true;
-    rotX += rotXTheta;
+
+    //flipping left
+    armMatrix.set(
+        1, 0, 0, 0,
+        0, Math.cos(rotXTheta), Math.sin(rotXTheta), 0,
+        0, -1 * (Math.sin(rotXTheta)), Math.cos(rotXTheta), 0,
+        0, 0, 0, 1
+    );
+    armLeft.geometry.applyMatrix4(armMatrix);
+    armLeft.geometry.verticesNeedUpdate = true;
 
     //now for the translations to appear connected
     //specifically the y and z translations
@@ -333,6 +360,19 @@ if(rotX <= 1 && flip == false) {
 
     armRight.geometry.applyMatrix4(armMatrix);
     armRight.geometry.verticesNeedUpdate = true;
+
+    armMatrix.set(
+        1, 0, 0, 0, //d messes with x translation
+        0, 1, 0,-1*(transY), //h messes with y translation
+        0, 0, 1, -1*(transZ), //p messes with z translation
+        0, 0,0,1
+
+    );
+
+    armLeft.geometry.applyMatrix4(armMatrix);
+    armLeft.geometry.verticesNeedUpdate = true;
+
+    rotX += rotXTheta;
 
     if(rotX < -1)
     {
