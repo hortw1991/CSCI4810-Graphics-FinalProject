@@ -7,7 +7,7 @@ let container;      	        // keeping here for easy access
 let scene, camera, renderer;    // Three.js rendering basics.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
-
+let ground;                     // Allows finding points via raycaster
 let player, target, head, armLeft, armRight, legLeft, legRight;       //player model
 //arm transformation variables
 let flip = false;
@@ -48,7 +48,7 @@ function createWorld()
     // camera.add(light);
     scene.add(new THREE.DirectionalLight(0x808080));
 
-    let ground = new THREE.Mesh(
+    ground = new THREE.Mesh(
         new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
             color: "white",
@@ -106,9 +106,9 @@ function setSpawnPoints()
     let g = new THREE.BoxGeometry(5, 5, 5);
     let m = new THREE.MeshBasicMaterial({color: 0x00ff00})
     let end = new THREE.Mesh(g, m);
-    scene.add(m);
+    scene.add(end);
     // end.position.x =
-
+ 
 }
 
 
@@ -780,14 +780,17 @@ function changeCamera()
 // Prints mouse click locations in the top down view
 function doMouseDown(event)
 {
-    let vector = new THREE.Vector3();
-    vector.set(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        - (event.clientY / window.innerHeight) * 2 + 1,
-        0
-    );
-    vector.unproject(camera);
-    console.log(vector);
+    let mouse = {x: 0, y: 0};
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    let raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera( mouse, camera );
+    let point = raycaster.intersectObjects( [ground] );
+    for (let i = 0; i < point.length; i++)
+    {
+        console.log(point[i].point)
+    }
 }
 
 
