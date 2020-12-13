@@ -38,9 +38,10 @@ let torchLocations = [
 ]
 
 
+
+
 let torch;                      //torch model (set as a single torch first)
 let flameRed, flameYell;
-let torchClone;
 
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
@@ -55,7 +56,10 @@ let rot = Math.PI / 45;
 
 //used to tell if the game needs to stop or not
 let totalTime = 200;
-let timeLeft; 
+let timeLeft;
+//lighting
+let ambLight;                   //ambient lighting
+let brightness;
 
 
 function createWorld()
@@ -64,13 +68,10 @@ function createWorld()
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(20, window.innerWidth/window.innerHeight, 1, 1000);
 
-    /* Add the camera and a light to the scene, linked into one object. */
-    let light = new THREE.DirectionalLight();
-    light.position.set( 0, 0, 1);
-
-    // camera.add(light);
-    scene.add(new THREE.DirectionalLight(0x808080));
-
+    //let light = new THREE.AmbientLight(0x404040)
+    ambLight = new THREE.AmbientLight(0x808080, 1);
+    scene.add(ambLight);
+    //scene.add(new THREE.AmbientLight(0x808080, 1));
     ground = new THREE.Mesh(
         new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
@@ -172,8 +173,11 @@ function updateTorch()
     handle.position.z = torchLocations[num][1];
 
 }
-
-
+//ambient light slowly goes out
+function lightingSystem()
+{
+    ambLight.intensity = timeLeft/totalTime;
+}
 
 /**
  * Adds a boundary wall around the outside
@@ -832,7 +836,6 @@ function updateForFrame()
     let timeCeiling = Math.ceil(time); //for the count down
     timeLeft = totalTime - timeCeiling
 
-
     /**
      * For this section this is where we are going transfer
      * time left in the game/progression to the player
@@ -998,7 +1001,7 @@ function doKeyDown( event )
         }
         else if (code =="t" || code == "e")
         {
-            totalTime += 10;
+            lightingSystem();
         }
         else if (code == 's' || code == 'ArrowDown')
         {    
@@ -1026,7 +1029,7 @@ function doFrame()
     modelMovement();
     doFlameRotation(flameRed);
     doFlameRotation(flameYell);
-
+    lightingSystem();
 
 
     render();
