@@ -15,6 +15,26 @@ let rotX = 0;
 let rotXTheta = 0.01;
 let transY = 0;
 let transZ = -.005;
+let gameover = false;     // Controls the render
+let handle;
+let camHelper;
+
+// Possible torch spawn locations
+let torchLocations = [
+    [0, 10],
+    [-64,60],
+    [50,-7],
+    [50,-73],
+    [-3,-18],
+    [56,-53],
+    [28,-59],
+    [-25,80],
+    [25,59],
+    [-15,41],
+    [-90,68],
+    [55,8],
+    [-25,-45]
+]
 
 
 let torch;                      //torch model (set as a single torch first)
@@ -70,9 +90,9 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 1, 40);
-    camera.rotation.x = -Math.PI/10; //camera looks down a bit
-    camera.lookAt( 0, 3, 0 );
+    camera.position.set(0, 1.7, 10);
+    camera.rotation.x = -Math.PI/4; //camera looks down a bit
+    camera.lookAt( 0, 0, 0 );
     head.add(target);
     head.add(camera);
   
@@ -118,7 +138,35 @@ function setSpawnPoints()
     head.position.x = -18;
     head.position.z = 15;
     head.rotateY(Math.PI); 
+    head.material.opacity = 0.5;
+    head.material.transparent = true;
 }
+
+
+/**
+ * Updates the torch location and the score
+ */
+function updateTorch()
+{
+    let min = 0; 
+    let max = torchLocations.length;
+
+    let num = Math.floor(Math.random() * (max - min) + min);
+    if (num == handle.loc)
+    {
+        num = (num + 1) % (max);
+    }
+
+    console.log(num);
+    
+    collision++;
+    timeLeft += 10;
+    handle.loc = num;
+    handle.position.x = torchLocations[num][0];
+    handle.position.z = torchLocations[num][1];
+
+}
+
 
 
 /**
@@ -127,7 +175,7 @@ function setSpawnPoints()
 function createOuterWalls()
 {
     // Overview for testing purposes
-    changeCamera();
+    // changeCamera();
     // Material that the rest are cloned off of
     let g = new THREE.BoxGeometry(40, 20, 1);
     let tex = new THREE.TextureLoader().load('./resources/cornwall.jpg');
@@ -554,8 +602,9 @@ function torchCreation()
     const handleGeometry = new THREE.BoxGeometry( handleWidth, handleHeight, handleDepth);
     const handleMaterial = new THREE.MeshPhongMaterial ( {color: 0x6F4E16} );
 
-    let handle = new THREE.Mesh(handleGeometry, handleMaterial);
+    handle = new THREE.Mesh(handleGeometry, handleMaterial);
     handle.type = "torch";
+    handle.loc = 0;
 
     scene.add(handle);
     handle.position.z = 10;
@@ -707,17 +756,43 @@ function checkWallCollisions(rev=false)
                     console.log(head.x, head.z);
                     return true;
                 }
+                // Gameover screen
                 else if (collisions[0].object.type == "end")
                 {
                     console.log("end");
+                    gameover = true;
+                    gameOverWin();
                 }
                 else if (collisions[0].object.type == "torch")
                 {
                     console.log("torch")
+                    updateTorch();
                 }
             }
         }
     }
+}
+
+
+function checkCameraRot()
+{
+    for (let i = 0; i < camera.geometry.vertices.length; i++)
+    {
+
+    }
+}
+
+
+/**
+ * Displays the game over victory screen with score and option to replay.
+ */
+function gameOverWin()
+{
+    let over = document.getElementById('gameover')
+    over.style.display = "block";
+    over.style.backgroundImage = "url(./resources/endscreen.jpg)"
+    over.style.backgroundSize = "100% 100%";
+    
 }
 
 
@@ -854,12 +929,12 @@ function doKeyDown( event )
         if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
         {
             head.rotateY(rot);
-            headBBoxHelper.update();
+            checkCameraRot();
         }
         else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
         {
             head.rotateY(-rot);
-            headBBoxHelper.update();
+            checkCameraRot();
         }
         /* These alter how close you can get to the maze */
         else if (code == 'w' || code == 'ArrowUp')
@@ -929,7 +1004,8 @@ function doFrame()
 
 
     render();
-    requestAnimationFrame(doFrame);
+    if (!gameover)
+        requestAnimationFrame(doFrame);
 }
 
 //----------------------- respond to window resizing -------------------------------

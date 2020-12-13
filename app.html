@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<title>Lights Out!</title>
 	<link href="css/main.css" rel="stylesheet" type="text/css">
+    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
 	<!-- <script src="https://unpkg.com/three@0.120.0/build/three.js"></script> -->
 	
 	<script id="vGlow" type="x-shader/x-fragment">
@@ -40,11 +41,18 @@
 	
 	<div id="scene-container">
 		<script src="app.js" type="module"></script>
-		
+		<div id="gameover" class="nes-container is-rounded" style="position:fixed; padding:8px; font-family: monospace;
+        margin: 0; z-index:10; min-width: 100%; min-height: 100%;
+        color:white; border: thick solid black; display: none;" >
+            <div id="centered">
+				<span id="text"><p>Sample Text<p></span>
+				<span id="score"></span>
+            </div>
+        </div>
 	</div>
 	<h3 style="position:fixed; top:5px; left:5px; padding:8px;
 	margin: 0; z-index:10; background-color:#32332A;
-	color:ghostwhite; border: thick solid ghostwhite">
+	color:ghostwhite; border: thick solid ghostwhite; font-family:monospace">
 	Escape the corn maze! <br>
 	Time Remaining: <span id="timeLeft">0</span><br>
 	Torches Collected: <span id="collected">0</span>

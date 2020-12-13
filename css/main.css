@@ -35,3 +35,56 @@ a:hover
 canvas {
     display: block;
 }
+
+
+#scorebox
+{
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
+
+#gameover
+{
+    opacity: 1;
+    animation-name: 'fadeIn';
+    animation-iteration-count: 1;
+    animation-duration: 2s;
+    animation-timing-function: ease-in;
+}
+
+@keyframes fadeIn
+{
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#centered
+{
+    position: absolute;
+    width: 75%;
+    height: 50%;
+    top: 25%;
+    left: 40%;
+    margin-left: -50px; /* margin is -0.5 * dimension */
+    margin-top: -25px; 
+    font-size: 100%;
+    animation-name: 'fontGrow';
+    animation-iteration-count: 1;
+    animation-duration: 5s;
+    animation-timing-function: ease;
+}
+
+@keyframes fontGrow
+{
+    0% {
+        font-size: 200%;
+    }
+    100% {
+        font-size: 300%;
+    }
+}
