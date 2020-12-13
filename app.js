@@ -70,19 +70,19 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 5, 80);
+    camera.position.set(0, 1, 40);
     camera.rotation.x = -Math.PI/10; //camera looks down a bit
     camera.lookAt( 0, 3, 0 );
     head.add(target);
     head.add(camera);
   
-    /* Setup head BBOx for collision detection.  Will likely need addition boxes for smaller objects unless floating. */
+    /* Setup head BBOx for collision detection help */
     headBBoxHelper = new THREE.BoxHelper(head, 'white');
-    scene.add(headBBoxHelper)
     headBBox = new THREE.Box3().setFromObject(headBBoxHelper);
 
     createOuterWalls();
     createHorizontalWalls();
+
     // createVerticalWalls();
 
     
@@ -97,7 +97,6 @@ function createWorld()
     ]);
     scene.background = texture;
 
-
 } // end createWorld
 
 
@@ -111,7 +110,12 @@ function createOuterWalls()
     changeCamera();
     // Material that the rest are cloned off of
     let g = new THREE.BoxGeometry(40, 20, 1);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let tex = new THREE.TextureLoader().load('./resources/cornwall.jpg');
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(4, 1);
+    let m = new THREE.MeshBasicMaterial( { map: tex} );
+
     let c1 = new THREE.Mesh(g, m);
     c1.position.z = -20;
     // scene.add(c1);
@@ -155,47 +159,172 @@ function createOuterWalls()
     walls.push(test2);
 }
 
+
+// Creates all non border walls.  These are custom placed, as it turns out
+// that completely randomizing them with our self-made collision system can
+// create unwinnable situations where the gap is too small to get through.
 function createHorizontalWalls()
 {
     // Material to clone into all wall shapes
+    let v = getWall(); v.rotateY(Math.PI/0);
+    v.position.x = -50;
+    v.position.z = -85;
+    v.scale.x = 3;
+    addWall(v);
+
+    let h1 = getWall();
+    h1.position.x = -77
+    h1.position.z = -72;
+    h1.scale.x = 3;
+    addWall(h1);
+
+    let h2 = getWall();
+    h2.position.x = -56;
+    h2.position.z = -57;
+    h2.scale.x = 9;
+    addWall(h2);
+
+    let h3 = getWall();
+    h3.position.x = 33;
+    h3.position.z = -85;
+    h3.scale.x = 10;
+    addWall(h3);
+    
+    let v1 = getWall(); v1.rotateY(Math.PI/2);
+    v1.position.x = -34;
+    v1.position.z = -74;
+    v1.scale.x = 3;
+    addWall(v1);
+
+    let h4 = getWall();
+    setWall(h4, 27, -72);
+    h4.scale.x = 9;
+
+    let v2 = getWall();
+    setWall(v2, 39, -31, true)
+    v2.scale.x = 11
+
+    let h5 = getWall();
+    setWall(h5, 23, -30); 
+    h5.scale.x = 15;
+
+    let v3 = getWall();
+    setWall(v3, 69, -53, true);
+    v3.scale.x = 1.5;
+
+    let v4 = getWall();
+    setWall(v4, 14, -55, true);
+    v4.scale.x = 3;
+
+    let v5 = getWall();
+    setWall(v5, -78, -25, true);
+    v5.scale.x = 4.5;
+    
+    let v6 = getWall();
+    setWall(v6, -18, -13, true);
+    v6.scale.x = 3
+
+    let v7 = getWall();
+    setWall(v7, -38, -30, true);
+    v7.scale.x = 2;
+
+    let h6 = getWall();
+    setWall(h6, 59, 80);
+    h6.scale.x = 5;
+
+    let h7 = getWall();
+    setWall(h7, -55, 51);
+    h7.scale.x = 6;
+
+    let h8 = getWall();
+    setWall(h8, -18, -9);
+    h8.scale.x = 8;
+
+    let v9 = getWall();
+    setWall(v9, -54, 50, true);
+    v9.scale.x = 7;
+
+    let v10 = getWall();
+    setWall(v10, 69, 26, true);
+    v10.scale.x = 5;
+
+    let v11 = getWall();
+    setWall(v11, 9, 40, true);
+    v11.scale.x = 8;
+
+    let h9 = getWall();
+    setWall(h9, -23, 29);
+    h9.scale.x = 4;
+
+    let h10 = getWall();
+    setWall(h10, -77, 34);
+    h10.scale.x = 4.5;
+
+    let v12 = getWall();
+    setWall(v12, -77, 67, true);
+    v12.scale.x = 3;
+
+    let h11 = getWall();
+    setWall(h11, 9, 65);
+    h11.scale.x = 4;
+
+    let v13 = getWall();
+    setWall(v13, -34, 73, true);
+    v13.scale.x = 2;
+
+    let v14 = getWall();
+    setWall(v14, 61, 89, true);
+    v14.scale.x = 2;
+
+    let h12 = getWall();
+    setWall(h12, 60, -14);
+    h12.scale.x = 4;
+
+    let h13 = getWall();
+    setWall(h13, 39, 39);
+    h13.scale.x = 3.5;
+
+    let v15 = getWall();
+    setWall(v15, 49, 60, true);
+    v15.scale.x = 2;
+
+    let h14 = getWall();
+    setWall(h14, -78, 17);
+    h14.scale.x = 2;
+    
+}
+
+/**
+ * The following 3 functions are helper functions we implemented once it was clear
+ * the best way to create a maze in a short amount of time is to hand pick the coordinates
+ */
+function setWall(w, x, z, rotate=false)
+{
+    // Set wall to scene with the given coords
+    w.position.x = x;
+    w.position.z = z;
+
+    // Check for rotation
+    if (rotate) w.rotateY(Math.PI/2);
+
+    addWall(w);
+
+}
+
+function getWall()
+{
+    // Returns a basic wall object
     let g = new THREE.BoxGeometry(10, 20, 3);
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    let h = new THREE.Mesh(g, m);
-    h.adjustZ = true;  // needed to control the bounding box
-    h.position.z = -20;
-    scene.add(h);
-    walls.push(h);
-
-    // c1.rotateY(Math.PI/2);
-    // scene.add(c1);
-    // walls.push(c1)
-
-    // let c2 = c1.clone();
-    // c2.position.z = -20;
-    // scene.add(c2);
-    // // c2.rotateX((*Math.PI / 2));
-    // walls.push(c2);
-
-    // let wall1 = c1.clone();
-    // wall1.position.z = -90;
-    // wall1.position.x = -90
-    // scene.add(wall1);
-    // walls.push(wall1);
+    return new THREE.Mesh(g, m);
 }
 
 
-function createVerticalWalls()
+function addWall(wall)
 {
-    // Material to clone into all wall shapes
-    let g = new THREE.BoxGeometry(10, 40, 1);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    let v = new THREE.Mesh(g, m);
-    v.adjustZ = false;
-    v.position.z = -20;
-    v.rotateY(Math.PI/2);
-    scene.add(v);
-    walls.push(v);
-
+    // Adds the wall to the scene and the array holding the walls
+    scene.add(wall);
+    walls.push(wall);
 }
 
 
@@ -213,7 +342,7 @@ function playerCreation()
     const headMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
     head = new THREE.Mesh(headGeometry, headMaterial);
-    scene.add(head);
+    scene.add(head);    
     head.position.y = 7;
 
     //player body
@@ -683,7 +812,7 @@ function doKeyDown( event )
         {
             for (let i = 0 ; i < 20; i++)
             {
-                head.translateZ(0.10);
+                head.translateZ(0.20);
             }
         }
         else 
@@ -714,7 +843,7 @@ function doKeyDown( event )
         if (checkWallCollisions())
         {
             for (let i = 0; i < 20; i++)
-                head.translateZ(-0.10);
+                head.translateZ(-0.20);
         }
         else 
         {
