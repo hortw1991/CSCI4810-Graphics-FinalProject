@@ -7,6 +7,7 @@ let container;      	        // keeping here for easy access
 let scene, camera, renderer;    // Three.js rendering basics.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
+let ground;
 
 let player, target, head, armLeft, armRight, legLeft, legRight;       //player model
 
@@ -20,7 +21,6 @@ let transZ = -.015;
 let torch;                      //torch model (set as a single torch first)
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
-let collisions = [];
 
 let collision = 0;
 let cameraControls;
@@ -48,7 +48,7 @@ function createWorld()
     // camera.add(light);
     scene.add(new THREE.DirectionalLight(0x808080));
 
-    let ground = new THREE.Mesh(
+    ground = new THREE.Mesh(
         new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
             color: "white",
@@ -80,9 +80,7 @@ function createWorld()
 
     createOuterWalls();
     createHorizontalWalls();
-    // createVerticalWalls();
 
-    
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
         'resources/skybox/posx.jpg',
@@ -146,54 +144,108 @@ function createOuterWalls()
     test.position.x = -80;
     scene.add(test);
     walls.push(test);
-    let test2 = test.clone();
-    // test2.rotateY(Math.PI / 180)
-    test.position.z = -86;
-    scene.add(test2);
-    walls.push(test2);
 }
+
 
 function createHorizontalWalls()
 {
     // Material to clone into all wall shapes
-    let g = new THREE.BoxGeometry(10, 20, 3);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    let h = new THREE.Mesh(g, m);
-    h.adjustZ = true;  // needed to control the bounding box
-    h.position.z = -20;
-    scene.add(h);
-    walls.push(h);
+    // let g = new THREE.BoxGeometry(10, 20, 3);
+    // let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )\
 
-    // c1.rotateY(Math.PI/2);
-    // scene.add(c1);
-    // walls.push(c1)
+    let v = getWall(); v.rotateY(Math.PI/0);
+    v.position.x = -50;
+    v.position.z = -85;
+    v.scale.x = 3;
+    addWall(v);
 
-    // let c2 = c1.clone();
-    // c2.position.z = -20;
-    // scene.add(c2);
-    // // c2.rotateX((*Math.PI / 2));
-    // walls.push(c2);
+    let h1 = getWall();
+    h1.position.x = -77
+    h1.position.z = -72;
+    h1.scale.x = 3;
+    addWall(h1);
 
-    // let wall1 = c1.clone();
-    // wall1.position.z = -90;
-    // wall1.position.x = -90
-    // scene.add(wall1);
-    // walls.push(wall1);
+    let h2 = getWall();
+    h2.position.x = -56;
+    h2.position.z = -57;
+    h2.scale.x = 9;
+    addWall(h2);
+
+    let h3 = getWall();
+    h3.position.x = 33;
+    h3.position.z = -85;
+    h3.scale.x = 10;
+    addWall(h3);
+    
+    let v1 = getWall(); v1.rotateY(Math.PI/2);
+    v1.position.x = -34;
+    v1.position.z = -74;
+    v1.scale.x = 3;
+    addWall(v1);
+
+    let h4 = getWall();
+    setWall(h4, 27, -72);
+    h4.scale.x = 9;
+
+    let v2 = getWall();
+    setWall(v2, 39, -31, true)
+    v2.scale.x = 11
+
+    let h5 = getWall();
+    setWall(h5, 23, -30); 
+    h5.scale.x = 15;
+
+    let v3 = getWall();
+    setWall(v3, 69, -53, true);
+    v3.scale.x = 1.5;
+
+    let v4 = getWall();
+    setWall(v4, 14, -55, true);
+    v4.scale.x = 3;
+
+    let v5 = getWall();
+    setWall(v5, -78, -25, true);
+    v5.scale.x = 4.5;
+    
+    let v6 = getWall();
+    setWall(v6, -18, -13, true);
+    v6.scale.x = 3
 }
 
 
-function createVerticalWalls()
-{
-    // Material to clone into all wall shapes
-    let g = new THREE.BoxGeometry(10, 40, 1);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    let v = new THREE.Mesh(g, m);
-    v.adjustZ = false;
-    v.position.z = -20;
-    v.rotateY(Math.PI/2);
-    scene.add(v);
-    walls.push(v);
 
+/**
+ * The following 3 functions are helper functions we implemented once it was clear
+ * the best way to create a maze in a short amount of time is to hand pick the coordinates
+ */
+function setWall(w, x, z, rotate=false)
+{
+    // Set wall to scene with the given coords
+    w.position.x = x;
+    w.position.z = z;
+
+    // Check for rotation
+    if (rotate) w.rotateY(Math.PI/2);
+
+
+    addWall(w);
+}
+
+
+function getWall()
+{
+    // Returns a basic wall object
+    let g = new THREE.BoxGeometry(10, 20, 3);
+    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    return new THREE.Mesh(g, m);
+}
+
+
+function addWall(wall)
+{
+    // Adds the wall to the scene and the array holding the walls
+    scene.add(wall);
+    walls.push(wall);
 }
 
 
@@ -274,8 +326,8 @@ function modelMovement()
      let armMatrix = new THREE.Matrix4();
 
 if(rotX <= 1 && flip == false) {
-    console.log("rotX = " +rotX);
-    console.log("flip = "+flip);
+    // console.log("rotX = " +rotX);
+    // console.log("flip = "+flip);
     armMatrix.set(
         1, 0, 0, 0,
         0, Math.cos(-rotXTheta), Math.sin(-rotXTheta), 0,
@@ -306,7 +358,7 @@ if(rotX <= 1 && flip == false) {
         transY *= -1;
         transZ *= -1;
         flip = true;
-        console.log("flip = "+flip);
+        // console.log("flip = "+flip);
     }
 }else if(rotX >= -1 && flip == true)
 {
@@ -340,7 +392,7 @@ if(rotX <= 1 && flip == false) {
         transY *= -1;
         transZ *= -1;
         flip = false;
-        console.log("Flip = "+flip);
+        // console.log("Flip = "+flip);
     }
 }
     //armRight.position.y = .6;
@@ -466,7 +518,7 @@ function checkWallCollisions(rev=false)
         // Check if the the collision is TOUCHING the actual wall (or less)
         if (collisions.length > 0)
         {
-            if (collisions[0].distance < rayAngle.length() + 1)
+            if (collisions[0].distance < rayAngle.length() + 2)
             {
                 return true;
             }
@@ -554,14 +606,17 @@ function changeCamera()
 // Prints mouse click locations in the top down view
 function doMouseDown(event)
 {
-    let vector = new THREE.Vector3();
-    vector.set(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        - (event.clientY / window.innerHeight) * 2 + 1,
-        0
-    );
-    vector.unproject(camera);
-    console.log(vector);
+    let mouse = {x: 0, y: 0};
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    let raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera( mouse, camera );
+    let point = raycaster.intersectObjects( [ground] );
+    for (let i = 0; i < point.length; i++)
+    {
+        console.log(point[i].point)
+    }
 }
 
 
