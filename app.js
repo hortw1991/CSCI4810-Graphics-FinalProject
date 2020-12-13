@@ -23,6 +23,8 @@ let torchClone;
 
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
+let p = []; // holds important points
+let endPoint;
 
 let collision = 0;
 let cameraControls;
@@ -82,6 +84,8 @@ function createWorld()
     createHorizontalWalls();
     setSpawnPoints();
 
+    for (let i = 0; i < walls.length; i++) walls[i].type = "wall";
+
     
     
     const loader = new THREE.CubeTextureLoader();
@@ -103,12 +107,17 @@ function createWorld()
  */
 function setSpawnPoints()
 {
-    let g = new THREE.BoxGeometry(5, 5, 5);
+    let g = new THREE.BoxGeometry(5, 30, 5);
     let m = new THREE.MeshBasicMaterial({color: 0x00ff00})
-    let end = new THREE.Mesh(g, m);
-    scene.add(end);
-    // end.position.x =
- 
+    endPoint = new THREE.Mesh(g, m);
+    scene.add(endPoint);
+    endPoint.position.z = 20;
+    endPoint.type = "end";
+    p.push(endPoint);
+
+    head.position.x = -18;
+    head.position.z = 15;
+    head.rotateY(Math.PI); 
 }
 
 
@@ -331,7 +340,7 @@ function getWall()
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(3, 2);
-    let m = new THREE.MeshBasicMaterial( { map: tex} );
+    let m = new THREE.MeshBasicMaterial( { map: tex } );
     
     return new THREE.Mesh(g, m);
 }
@@ -546,9 +555,11 @@ function torchCreation()
     const handleMaterial = new THREE.MeshPhongMaterial ( {color: 0x6F4E16} );
 
     let handle = new THREE.Mesh(handleGeometry, handleMaterial);
+    handle.type = "torch";
 
     scene.add(handle);
     handle.position.z = 10;
+    handle.position.y = 5;
 
     const cubeWidth = 1;
     const cubeHeight = 1;
@@ -575,7 +586,11 @@ function torchCreation()
     //doFlameRotation(flameRed);
     //doFlameRotation(flameRed);
 
+    // Create an invisible box around the torch to recognize collision
+    // let g = new THREE.BoxGeometry(5, 5, 5);
 }
+
+
 function doFlameRotation(flame)
 {
     let theta = 0.01;
@@ -680,14 +695,26 @@ function checkWallCollisions(rev=false)
 
         // Get any collisions
         let raycaster = new THREE.Raycaster(headPos, rayAngle.clone().normalize());
-        let collisions = raycaster.intersectObjects(walls);
+        let collisions = raycaster.intersectObjects(scene.children);
 
         // Check if the the collision is TOUCHING the actual wall (or less)
         if (collisions.length > 0)
         {
             if (collisions[0].distance < rayAngle.length() + 1)
             {
-                return true;
+                if (collisions[0].object.type == "wall")
+                {
+                    console.log(head.x, head.z);
+                    return true;
+                }
+                else if (collisions[0].object.type == "end")
+                {
+                    console.log("end");
+                }
+                else if (collisions[0].object.type == "torch")
+                {
+                    console.log("torch")
+                }
             }
         }
     }
