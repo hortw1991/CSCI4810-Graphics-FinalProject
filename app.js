@@ -30,11 +30,9 @@ let overview = false;
 let mousePos;
 let rot = Math.PI / 45;
 
-/**
- *  Creates the bouncing balls and the translucent cube in which the balls bounce,
- *  and adds them to the scene.  A light that shines from the direction of the
- *  camera's view is also bundled with the camera and added to the scene.
- */
+//used to tell if the game needs to stop or not
+let totalTime = 200;
+let timeLeft; 
 
 
 function createWorld()
@@ -316,6 +314,12 @@ function getWall()
     // Returns a basic wall object
     let g = new THREE.BoxGeometry(10, 20, 3);
     let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    // let tex = new THREE.TextureLoader().load('./resources/cornwall.jpg');
+    // tex.wrapS = THREE.RepeatWrapping;
+    // tex.wrapT = THREE.RepeatWrapping;
+    // tex.repeat.set(4, 1);
+    // let m = new THREE.MeshBasicMaterial( { map: tex} );
+    
     return new THREE.Mesh(g, m);
 }
 
@@ -686,6 +690,8 @@ function updateForFrame()
     let time = clock.getElapsedTime(); // time, in seconds, since clock was created
     let timeFloor = Math.floor(time); //for testing timer going up
     let timeCeiling = Math.ceil(time); //for the count down
+    timeLeft = totalTime - timeCeiling
+
 
     /**
      * For this section this is where we are going transfer
@@ -693,8 +699,13 @@ function updateForFrame()
      * so that they can see a count down
      **/
 
-    document.getElementById("timeLeft").innerHTML = "" + timeFloor;
-    document.getElementById("collected").innerHTML = "" + collision;
+     if(timeLeft >= 0) {
+        document.getElementById("timeLeft").innerHTML = "" + timeLeft;
+        document.getElementById("collected").innerHTML = "" + collision;
+    }
+    else{
+        document.getElementById("timeLeft").innerHTML = "Lights Out!"; 
+    }
 }
 
 
@@ -793,64 +804,71 @@ function doKeyDown( event )
 
     //this will be for movement of player model
     const code = event.key;
-    // console.log("Key pressed with code " + code);
-    if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
+    if (timeLeft >= 0)
     {
-        head.rotateY(rot);
-        headBBoxHelper.update();
-    }
-    else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
-    {
-        head.rotateY(-rot);
-        headBBoxHelper.update();
-    }
-    /* These alter how close you can get to the maze */
-    else if (code == 'w' || code == 'ArrowUp')
-    {
-        // if (checkWallCollisions(0, 0, -1.50) || checkWallCollisions(1.50, 0, 0) || checkWallCollisions(-1.50, 0, 0))
-        if (checkWallCollisions())
-        {
-            for (let i = 0 ; i < 20; i++)
-            {
-                head.translateZ(0.20);
-            }
-        }
-        else 
-        {
-            head.translateZ(-1);
-        }
-    }
-    else if (code == 'q')
-    {
-        if (checkWallCollisions())
-        {
-            for (let i = 0 ; i < 5; i++)
-            {
-                head.translateZ(0.05);
-            }
-        }
-        else 
-        {
-            head.translateZ(-2);
-        }
-    }
-    else if (code == '=')
-    {
-        changeCamera();
-    }
-    else if (code == 's' || code == 'ArrowDown')
-    {    
-        if (checkWallCollisions())
-        {
-            for (let i = 0; i < 20; i++)
-                head.translateZ(-0.20);
-        }
-        else 
-        {
-            head.translateZ(1);
-        }
-    }
 
+        // console.log("Key pressed with code " + code);
+        if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
+        {
+            head.rotateY(rot);
+            headBBoxHelper.update();
+        }
+        else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
+        {
+            head.rotateY(-rot);
+            headBBoxHelper.update();
+        }
+        /* These alter how close you can get to the maze */
+        else if (code == 'w' || code == 'ArrowUp')
+        {
+            // if (checkWallCollisions(0, 0, -1.50) || checkWallCollisions(1.50, 0, 0) || checkWallCollisions(-1.50, 0, 0))
+            if (checkWallCollisions())
+            {
+                for (let i = 0 ; i < 20; i++)
+                {
+                    head.translateZ(0.20);
+                }
+            }
+            else 
+            {
+                head.translateZ(-1);
+            }
+        }
+        else if (code == 'q')
+        {
+            if (checkWallCollisions())
+            {
+                for (let i = 0 ; i < 5; i++)
+                {
+                    head.translateZ(0.05);
+                }
+            }
+            else 
+            {
+                head.translateZ(-2);
+            }
+        }
+        else if (code == '=')
+        {
+            changeCamera();
+        }
+        else if (code =="t" || code == "e")
+        {
+            totalTime += 10;
+        }
+        else if (code == 's' || code == 'ArrowDown')
+        {    
+            if (checkWallCollisions())
+            {
+                for (let i = 0; i < 20; i++)
+                    head.translateZ(-0.20);
+            }
+            else 
+            {
+                head.translateZ(1);
+            }
+        }
+    }
 }
 
 //--------------------------- animation support -----------------------------------
@@ -864,6 +882,8 @@ function doFrame()
     modelMovement();
     doFlameRotation(flameRed);
     doFlameRotation(flameYell);
+
+
 
     render();
     requestAnimationFrame(doFrame);
