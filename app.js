@@ -8,7 +8,15 @@ let scene, camera, renderer;    // Three.js rendering basics.
 let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
-let player, target, head;       //player model
+let player, target, head, armLeft, armRight, legLeft, legRight;       //player model
+
+let flip = false;
+let rotX = 0;
+let rotXTheta = 0.01;
+let transY = 0.006;
+let transZ = -.015;
+
+
 let torch;                      //torch model (set as a single torch first)
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
@@ -84,6 +92,7 @@ function createWorld()
     ]);
     scene.background = texture;
     
+    //modelMovement();
 
 } // end createWorld
 
@@ -228,11 +237,16 @@ function playerCreation()
     const armHeight = 4;
     const armDepth = 1;
 
-    let armGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
-    let armMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+    //need double because with the matrix they modify both limbs when adjusting
+    //the matrices so we can have control over each individual arm.
+    let armRightGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
+    let armRightMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
-    let armLeft = new THREE.Mesh(armGeometry, armMaterial);
-    let armRight = new THREE.Mesh(armGeometry, armMaterial);
+    let armLeftGeometry = new THREE.BoxGeometry( armWidth, armHeight, armDepth );
+    let armLeftMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
+
+    armLeft = new THREE.Mesh(armLeftGeometry, armLeftMaterial);
+    armRight = new THREE.Mesh(armRightGeometry, armRightMaterial);
 
     body.add(armLeft);
     armLeft.position.x = -1.5;
@@ -247,8 +261,8 @@ function playerCreation()
     let legGeometry = new THREE.BoxGeometry( legWidth, legHeight, legDepth );
     let legMaterial = new THREE.MeshPhongMaterial ( {color: 0xDB1E62} );
 
-    let legLeft = new THREE.Mesh(legGeometry, legMaterial);
-    let legRight = new THREE.Mesh(legGeometry, legMaterial);
+    legLeft = new THREE.Mesh(legGeometry, legMaterial);
+    legRight = new THREE.Mesh(legGeometry, legMaterial);
 
     body.add(legLeft);
     legLeft.position.y = -3;
@@ -259,6 +273,86 @@ function playerCreation()
     legRight.position.x = -0.75;
 
 }//end of playerCreation
+
+function modelMovement()
+{
+    //rotation x of the right arm
+     let armMatrix = new THREE.Matrix4();
+
+if(rotX <= 1 && flip == false) {
+    console.log("rotX = " +rotX);
+    console.log("flip = "+flip);
+    armMatrix.set(
+        1, 0, 0, 0,
+        0, Math.cos(-rotXTheta), Math.sin(-rotXTheta), 0,
+        0, -1 * (Math.sin(-rotXTheta)), Math.cos(-rotXTheta), 0,
+        0, 0, 0, 1
+    );
+
+    armRight.geometry.applyMatrix4(armMatrix);
+    armRight.geometry.verticesNeedUpdate = true;
+    rotX += rotXTheta;
+
+        //now for the translations to appear connected
+        //specifically the y and z translations
+        armMatrix.set(
+            1, 0, 0, 0, //d messes with x translation
+            0, 1, 0,transY, //h messes with y translation
+            0, 0, 1, transZ, //p messes with z translation
+            0, 0,0,1
+
+        );
+
+        armRight.geometry.applyMatrix4(armMatrix);
+        armRight.geometry.verticesNeedUpdate = true;
+
+    if(rotX > 1)
+    {
+        rotXTheta *= -1;
+        transY *= -1;
+        transZ *= -1;
+        flip = true;
+        console.log("flip = "+flip);
+    }
+}else if(rotX >= -1 && flip == true)
+{
+    armMatrix.set(
+        1, 0, 0, 0,
+        0, Math.cos(-rotXTheta), Math.sin(-rotXTheta), 0,
+        0, -1 * (Math.sin(-rotXTheta)), Math.cos(-rotXTheta), 0,
+        0, 0, 0, 1
+    );
+
+    armRight.geometry.applyMatrix4(armMatrix);
+    armRight.geometry.verticesNeedUpdate = true;
+    rotX += rotXTheta;
+
+    //now for the translations to appear connected
+    //specifically the y and z translations
+    armMatrix.set(
+        1, 0, 0, 0, //d messes with x translation
+        0, 1, 0,transY, //h messes with y translation
+        0, 0, 1, transZ, //p messes with z translation
+        0, 0,0,1
+
+    );
+
+    armRight.geometry.applyMatrix4(armMatrix);
+    armRight.geometry.verticesNeedUpdate = true;
+
+    if(rotX < -1)
+    {
+        rotXTheta *= -1;
+        transY *= -1;
+        transZ *= -1;
+        flip = false;
+        console.log("Flip = "+flip);
+    }
+}
+    //armRight.position.y = .6;
+    //armRight.position.z = -1.5;
+
+}
 
 function torchCreation()
 {
@@ -577,6 +671,8 @@ function doFrame()
 {
     updateForFrame();
     // checkWallCollisions();
+    modelMovement();
+
     render();
     requestAnimationFrame(doFrame);
 }
