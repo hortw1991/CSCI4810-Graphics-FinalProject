@@ -797,10 +797,10 @@ function checkCameraRot(rot)
 
         if (collisions.length > 0)
         {
-            if (collisions[0].distance < rayAngle.length())
+            if (collisions[0].distance < rayAngle.length()-1)
             {
                 console.log("camlission");
-                camera.position.set(0, 1, 0);
+                camera.position.set(0, 1.5, 5);
             }
 
         } 

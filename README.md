@@ -36,7 +36,7 @@ https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&
 - [x] Score keeping
 - [ ] Loss scenario and screen
 - [ ] Win scenario and screen
-- [ ] ThreeJS transitions to matrices
+- [x] ThreeJS transitions to matrices
 - [ ] Torch bounding box / raycasting with collision
 - [ ] Torch hovering
 - [ ] Fix camera angle
