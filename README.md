@@ -25,6 +25,14 @@ http://www.humus.name/index.php?page=Cubemap&item=Powerlines
 Corn Stalks:
 https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&utm_content=creditShareLink
 
+## Attributions
+
+"Corn Maze Entrance/Exit"
+
+Photo by Ingmar on Unsplash
+
+All other textures required no attribution.
+
 ## TODOs
 
 - [x] Collision
@@ -35,10 +43,10 @@ https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&
 - [x] Wall textures
 - [x] Score keeping
 - [ ] Loss scenario and screen
-- [ ] Win scenario and screen
+- [X] Win scenario and screen
 - [x] ThreeJS transitions to matrices
-- [ ] Torch bounding box / raycasting with collision
-- [ ] Torch hovering
-- [ ] Fix camera angle
+- [X] Torch bounding box / raycasting with collision
+- [X] Torch hovering
+- [X] Fix camera angle
 - [ ] Rebind sprint key - stamina
 - [x] Make floor look cool

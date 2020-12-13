@@ -197,7 +197,7 @@ function createOuterWalls()
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(4, 1);
-    let m = new THREE.MeshBasicMaterial( { map: tex} );
+    let m = new THREE.MeshLambertMaterial( { map: tex} );
 
     let c1 = new THREE.Mesh(g, m);
     c1.position.z = -20;
@@ -403,7 +403,7 @@ function getWall()
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(3, 2);
-    let m = new THREE.MeshBasicMaterial( { map: tex } );
+    let m = new THREE.MeshLambertMaterial( { map: tex } );
     
     return new THREE.Mesh(g, m);
 }
