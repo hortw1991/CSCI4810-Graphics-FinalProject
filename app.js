@@ -78,7 +78,7 @@ function createWorld(diff)
         new THREE.PlaneGeometry(200, 200),
         new THREE.MeshLambertMaterial({
             color: "white",
-            map: makeTexture("resources/spookyGround.png")
+            map: makeTexture("resources/spookyGround1.png")
         })
     );
 
@@ -139,8 +139,10 @@ function createWorld(diff)
  */
 function setSpawnPoints()
 {
-    let g = new THREE.BoxGeometry(5, 30, 5);
-    let m = new THREE.MeshBasicMaterial({color: 0x00ff00})
+    let g = new THREE.BoxGeometry(8, 20, 3);
+    let tex = new THREE.TextureLoader().load('./resources/cornentrance.jpg');
+
+    let m = new THREE.MeshBasicMaterial({map:tex})
     endPoint = new THREE.Mesh(g, m);
     scene.add(endPoint);
     endPoint.position.z = 20;
