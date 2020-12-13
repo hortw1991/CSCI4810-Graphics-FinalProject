@@ -22,20 +22,23 @@ https://www.deviantart.com/shadowh3/art/Rock-Ground-73682465
 Skybox:
 http://www.humus.name/index.php?page=Cubemap&item=Powerlines
 
+Corn Stalks:
+https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&utm_content=creditShareLink
+
 ## TODOs
 
 - [x] Collision
 - [x] Top Down Camera for Testing
 - [x] Torch Model
-- [ ] Wall around outside
+- [x] Wall around outside
 - [ ] Implement maze design
 - [ ] Wall textures
-- [ ] Score keeping
+- [x] Score keeping
 - [ ] Loss scenario and screen
 - [ ] Win scenario and screen
-- [ ] ThreeJS transitions
+- [ ] ThreeJS transitions to matrices
 - [ ] Torch bounding box / raycasting with collision
 - [ ] Torch hovering
 - [ ] Fix camera angle
 - [ ] Rebind sprint key - stamina
-- [ ] Make floor look cool
+- [x] Make floor look cool
