@@ -9,18 +9,20 @@ let ray;                        // A yellow "ray" from the barrel of the gun.
 let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 
 let player, target, head, armLeft, armRight, legLeft, legRight;       //player model
-
+//arm transformation variables
 let flip = false;
 let rotX = 0;
 let rotXTheta = 0.01;
-let transY = 0.006;
-let transZ = -.015;
+let transY = 0;
+let transZ = -.005;
 
 
 let torch;                      //torch model (set as a single torch first)
+let flameRed, flameYell;
+let torchClone;
+
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
-let collisions = [];
 
 let collision = 0;
 let cameraControls;
@@ -62,6 +64,7 @@ function createWorld()
 
     player = playerCreation();
     torch = torchCreation();
+    //torchClone = torch.clone();
 
     /* Attach camera to a new 3D mesh to track the player */
     target = new THREE.Object3D;  // Could be used to track/follow the player 
@@ -93,8 +96,7 @@ function createWorld()
         'resources/skybox/negz.jpg',
     ]);
     scene.background = texture;
-    
-    //modelMovement();
+
 
 } // end createWorld
 
@@ -273,7 +275,7 @@ function modelMovement()
     //rotation x of the right arm
      let armMatrix = new THREE.Matrix4();
 
-if(rotX <= 1 && flip == false) {
+if(rotX <= .5 && flip == false) {
    //flipping right
     armMatrix.set(
         1, 0, 0, 0,
@@ -318,7 +320,7 @@ if(rotX <= 1 && flip == false) {
     armLeft.geometry.applyMatrix4(armMatrix);
     armLeft.geometry.verticesNeedUpdate = true;
         rotX += rotXTheta;
-    if(rotX > 1)
+    if(rotX > .5)
     {
         rotXTheta *= -1;
         transY *= -1;
@@ -326,7 +328,7 @@ if(rotX <= 1 && flip == false) {
         flip = true;
 
     }
-}else if(rotX >= -1 && flip == true)
+}else if(rotX >= -.5 && flip == true)
 {
     armMatrix.set(
         1, 0, 0, 0,
@@ -374,7 +376,7 @@ if(rotX <= 1 && flip == false) {
 
     rotX += rotXTheta;
 
-    if(rotX < -1)
+    if(rotX < -.5)
     {
         rotXTheta *= -1;
         transY *= -1;
@@ -406,14 +408,16 @@ function torchCreation()
     const cubeHeight = 1;
     const cubeDepth = 1;
 
-    const flameGeometry = new THREE.BoxGeometry( cubeWidth, cubeHeight, cubeDepth);
+    const flameRedGeometry = new THREE.BoxGeometry( cubeWidth, cubeHeight, cubeDepth);
+    const flameYellGeometry = new THREE.BoxGeometry( cubeWidth, cubeHeight, cubeDepth);
+
     const flameRedMaterial = glowRedShader();
 
-    let flameRed = new THREE.Mesh(flameGeometry, flameRedMaterial);
+    flameRed = new THREE.Mesh(flameRedGeometry, flameRedMaterial);
     handle.add(flameRed);
 
     const flameYellMaterial = glowYellowShader();
-    let flameYell = new THREE.Mesh(flameGeometry, flameYellMaterial);
+    flameYell = new THREE.Mesh(flameYellGeometry, flameYellMaterial);
     handle.add(flameYell);
 
     flameYell.position.y = 1.75;
@@ -422,8 +426,37 @@ function torchCreation()
     flameYell.rotation.z = -Math.sin(2);
     flameRed.position.y = 1.75;
 
-}
+    //doFlameRotation(flameRed);
+    //doFlameRotation(flameRed);
 
+}
+function doFlameRotation(flame)
+{
+    let theta = 0.01;
+    let flameMatrix = new THREE.Matrix4();
+    //x rotation
+    flameMatrix.set(
+        1, 0, 0, 0,
+        0, Math.cos(theta), Math.sin(theta), 0,
+        0, -1 * (Math.sin(theta)), Math.cos(theta), 0,
+        0, 0, 0, 1
+
+    );
+
+    flame.geometry.applyMatrix4(flameMatrix);
+    flame.geometry.verticesNeedUpdate = true;
+    //y rotation
+    flameMatrix.set(
+        Math.cos(theta), 0, Math.sin(theta), 0,
+        0, 1, 0, 0,
+        -1*(Math.sin(theta)), 0, Math.cos(theta), 0,
+        0, 0, 0, 1
+
+    );
+    flame.geometry.applyMatrix4(flameMatrix);
+    flame.geometry.verticesNeedUpdate = true;
+
+}
 function glowRedShader()
 {
     let     vShader = document.getElementById('vGlow').innerHTML;
@@ -700,6 +733,8 @@ function doFrame()
     updateForFrame();
     // checkWallCollisions();
     modelMovement();
+    doFlameRotation(flameRed);
+    doFlameRotation(flameYell);
 
     render();
     requestAnimationFrame(doFrame);
