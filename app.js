@@ -5,8 +5,6 @@ import * as THREE from 'https://unpkg.com/three@0.120.0/build/three.module.js';
 
 let container;      	        // keeping here for easy access
 let scene, camera, renderer;    // Three.js rendering basics.
-let ray;                        // A yellow "ray" from the barrel of the gun.
-let rayVector;                  // The gun and the ray point from (0,0,0) towards this vector
 let ground;                     // Allows finding points via raycaster
 let player, target, head, armLeft, armRight, legLeft, legRight;       //player model
 //arm transformation variables
@@ -18,6 +16,8 @@ let transZ = -.005;
 let gameover = false;     // Controls the render
 let handle;
 let camHelper;
+
+let hard = false;
 
 
 // Possible torch spawn locations
@@ -91,9 +91,9 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 1.7, 10);
-    camera.rotation.x = -Math.PI/4; //camera looks down a bit
-    camera.lookAt( 0, 0, 0 );
+    camera.position.set(0, 40, 75);
+    // camera.rotation.x = -Math.PI; //camera looks down a bit
+    camera.lookAt( 0, 5, 0 );
     
     camHelper = new THREE.Mesh(
         new THREE.BoxGeometry(2, 2, 2),
@@ -114,8 +114,6 @@ function createWorld()
 
     for (let i = 0; i < walls.length; i++) walls[i].type = "wall";
 
-    
-    
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
         'resources/skybox/posx.jpg',
@@ -785,8 +783,6 @@ function checkWallCollisions(rev=false)
 function checkCameraRot(rot)
 {
     let camPos = camHelper.rotateY(rot).position.clone();
-    
-
     for (let i = 0; i < camHelper.geometry.vertices.length; i++)
     {
         let localPos = camHelper.geometry.vertices[i].clone();
@@ -957,13 +953,12 @@ function doKeyDown( event )
         // console.log("Key pressed with code " + code);
         if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
         {
-
-            checkCameraRot(rot);
+            if (hard) checkCameraRot(rot);
             head.rotateY(rot);
         }
         else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
         {
-            checkCameraRot(-rot);
+            if (hard) checkCameraRot(-rot);
             head.rotateY(-rot);
         }
         /* These alter how close you can get to the maze */
@@ -979,7 +974,7 @@ function doKeyDown( event )
             }
             else 
             {
-                camera.position.set(0, 1.7, 10);
+                if (hard) camera.position.set(0, 1.7, 10);
                 head.translateZ(-1);
             }
         }
