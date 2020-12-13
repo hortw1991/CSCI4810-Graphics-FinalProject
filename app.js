@@ -80,9 +80,9 @@ function createWorld()
 
     createOuterWalls();
     createHorizontalWalls();
+    setSpawnPoints();
 
-    // createVerticalWalls();
-
+    
     
     const loader = new THREE.CubeTextureLoader();
     const texture = loader.load([
@@ -97,6 +97,19 @@ function createWorld()
 
 } // end createWorld
 
+
+/**
+ * Sets up the player's spawn and end location
+ */
+function setSpawnPoints()
+{
+    let g = new THREE.BoxGeometry(5, 5, 5);
+    let m = new THREE.MeshBasicMaterial({color: 0x00ff00})
+    let end = new THREE.Mesh(g, m);
+    scene.add(m);
+    // end.position.x =
+
+}
 
 
 /**
@@ -313,12 +326,12 @@ function getWall()
 {
     // Returns a basic wall object
     let g = new THREE.BoxGeometry(10, 20, 3);
-    let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
-    // let tex = new THREE.TextureLoader().load('./resources/cornwall.jpg');
-    // tex.wrapS = THREE.RepeatWrapping;
-    // tex.wrapT = THREE.RepeatWrapping;
-    // tex.repeat.set(4, 1);
-    // let m = new THREE.MeshBasicMaterial( { map: tex} );
+    // let m = new THREE.MeshBasicMaterial( {color: 0x00ff00} )
+    let tex = new THREE.TextureLoader().load('./resources/compress_cornwall2.jpg');
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(3, 2);
+    let m = new THREE.MeshBasicMaterial( { map: tex} );
     
     return new THREE.Mesh(g, m);
 }

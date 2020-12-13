@@ -31,8 +31,8 @@ https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&
 - [x] Top Down Camera for Testing
 - [x] Torch Model
 - [x] Wall around outside
-- [ ] Implement maze design
-- [ ] Wall textures
+- [x] Implement maze design
+- [x] Wall textures
 - [x] Score keeping
 - [ ] Loss scenario and screen
 - [ ] Win scenario and screen
