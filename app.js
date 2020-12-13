@@ -19,6 +19,7 @@ let gameover = false;     // Controls the render
 let handle;
 let camHelper;
 
+
 // Possible torch spawn locations
 let torchLocations = [
     [0, 10],
@@ -93,6 +94,13 @@ function createWorld()
     camera.position.set(0, 1.7, 10);
     camera.rotation.x = -Math.PI/4; //camera looks down a bit
     camera.lookAt( 0, 0, 0 );
+    
+    camHelper = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 2, 2),
+        new THREE.MeshBasicMaterial({color: "red"})
+    );
+    camera.add(camHelper);
+
     head.add(target);
     head.add(camera);
   
@@ -774,11 +782,32 @@ function checkWallCollisions(rev=false)
 }
 
 
-function checkCameraRot()
+function checkCameraRot(rot)
 {
-    for (let i = 0; i < camera.geometry.vertices.length; i++)
-    {
+    let camPos = camHelper.rotateY(rot).position.clone();
+    
 
+    for (let i = 0; i < camHelper.geometry.vertices.length; i++)
+    {
+        let localPos = camHelper.geometry.vertices[i].clone();
+        let globalAngle = localPos.applyMatrix4(head.matrix);
+        let rayAngle = globalAngle.sub(camHelper.position);
+        let raycaster = new THREE.Raycaster(camPos, rayAngle.clone().normalize());
+        let collisions = raycaster.intersectObjects(scene.children);
+
+        if (collisions.length > 0)
+        {
+            if (collisions[0].distance < rayAngle.length())
+            {
+                console.log("camlission");
+                camera.position.set(0, 1, 0);
+            }
+
+        } 
+        else
+            {
+                camera.position.set(0, 1.7, 10);
+            }
     }
 }
 
@@ -928,13 +957,14 @@ function doKeyDown( event )
         // console.log("Key pressed with code " + code);
         if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
         {
+
+            checkCameraRot(rot);
             head.rotateY(rot);
-            checkCameraRot();
         }
         else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
         {
+            checkCameraRot(-rot);
             head.rotateY(-rot);
-            checkCameraRot();
         }
         /* These alter how close you can get to the maze */
         else if (code == 'w' || code == 'ArrowUp')
@@ -949,6 +979,7 @@ function doKeyDown( event )
             }
             else 
             {
+                camera.position.set(0, 1.7, 10);
                 head.translateZ(-1);
             }
         }
