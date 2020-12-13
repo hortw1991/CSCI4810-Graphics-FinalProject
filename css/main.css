@@ -79,6 +79,19 @@ canvas {
     animation-timing-function: ease;
 }
 
+
+#centered-good
+{
+    position: absolute;
+    width: 75%;
+    height: 50%;
+    top: 25%;
+    left: 40%;
+    margin-left: -50px; /* margin is -0.5 * dimension */
+    margin-top: -25px; 
+    font-size: 100%;
+}
+
 @keyframes fontGrow
 {
     0% {

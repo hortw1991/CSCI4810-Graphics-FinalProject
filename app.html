@@ -37,10 +37,21 @@
 </head>
 
 <body>
-	
-	
 	<div id="scene-container">
 		<script src="app.js" type="module"></script>
+		<div id="start" class="nes-container is-rounded" style="position:fixed; padding:8px; font-family: monospace;
+        margin: 0; z-index:10; min-width: 100%; min-height: 100%;
+        color:white; border: thick solid gold; display: hidden;" >
+			<div id="centered-good">
+				<h2>Enter the corn.  Easy or hard?</h2>
+				<h3>There is no going back.</h3>
+				<button id="easybtn">Easy</button>
+				<br><br>
+				<button id="hardbtn">Hard</button>
+			</div>
+        </div>
+
+
 		<div id="gameover" class="nes-container is-rounded" style="position:fixed; padding:8px; font-family: monospace;
         margin: 0; z-index:10; min-width: 100%; min-height: 100%;
         color:white; border: thick solid black; display: none;" >

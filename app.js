@@ -17,7 +17,7 @@ let gameover = false;     // Controls the render
 let handle;
 let camHelper;
 
-let hard = false;
+let hard;
 
 
 // Possible torch spawn locations
@@ -58,8 +58,10 @@ let totalTime = 200;
 let timeLeft; 
 
 
-function createWorld()
+function createWorld(diff)
 {
+    hard = diff;
+
     renderer.setClearColor( 0 );  // black background
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(20, window.innerWidth/window.innerHeight, 1, 1000);
@@ -91,9 +93,12 @@ function createWorld()
     target = new THREE.Object3D;  // Could be used to track/follow the player 
 
     // Camera distance controls
-    camera.position.set(0, 40, 75);
-    // camera.rotation.x = -Math.PI; //camera looks down a bit
-    camera.lookAt( 0, 5, 0 );
+    if (hard)
+        camera.position.set(0, 1.7, 10);
+    else 
+        camera.position.set(0, 40, 75);
+
+    camera.lookAt( 0, 0, 0 );
     
     camHelper = new THREE.Mesh(
         new THREE.BoxGeometry(2, 2, 2),
@@ -850,6 +855,12 @@ function updateForFrame()
 
 
 /**
+ * Changes the difficulty by switching the camera mode.
+ */
+
+
+
+/**
  *  Render the scene.  This is called for each frame of the animation, after updating
  *  the position and velocity data of the balls.
  */
@@ -883,7 +894,7 @@ function makeTexture( imageURL, material )
     return texture;
 }
 
-
+// Shows an overhead for demonstration purposes
 function changeCamera() 
 {
     if (overview)
@@ -1076,15 +1087,29 @@ function init()
     document.addEventListener("keydown",doKeyDown);
     window.addEventListener(    "mousedown",doMouseDown );
     window.addEventListener(    "mousemove",doMouseMove );
+    document.getElementById('easybtn').addEventListener('click', () => {
 
-    createWorld();
+        createWorld(false);
+        start();
+
+    });
+    document.getElementById('hardbtn').addEventListener('click', () => {
+        createWorld(true);
+        start();
+    });
+
+
 
     clock = new THREE.Clock(); // For keeping time during the animation.
+    // start();
 
-
-    requestAnimationFrame(doFrame);  // Start the animation.
 
 }
 
+function start()
+{
+    document.getElementById("start").style.display = "none";
+    requestAnimationFrame(doFrame);  // Start the animation.
+}
 init()
 
