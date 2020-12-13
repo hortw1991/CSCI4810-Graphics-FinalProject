@@ -30,6 +30,10 @@ let overview = false;
 let mousePos;
 let rot = Math.PI / 45;
 
+//used to tell if the game needs to stop or not
+let totalTime = 200;
+let timeLeft;
+
 /**
  *  Creates the bouncing balls and the translucent cube in which the balls bounce,
  *  and adds them to the scene.  A light that shines from the direction of the
@@ -558,14 +562,18 @@ function updateForFrame()
     let timeFloor = Math.floor(time); //for testing timer going up
     let timeCeiling = Math.ceil(time); //for the count down
 
+    timeLeft = totalTime - timeCeiling;
     /**
      * For this section this is where we are going transfer
      * time left in the game/progression to the player
      * so that they can see a count down
      **/
-
-    document.getElementById("timeLeft").innerHTML = "" + timeFloor;
-    document.getElementById("collected").innerHTML = "" + collision;
+    if(timeLeft >= 0) {
+        document.getElementById("timeLeft").innerHTML = "" + timeLeft;
+        document.getElementById("collected").innerHTML = "" + collision;
+    }else{
+        document.getElementById("timeLeft").innerHTML = "Lights Out!";
+    }
 }
 
 
@@ -665,61 +673,48 @@ function doKeyDown( event )
     //this will be for movement of player model
     const code = event.key;
     // console.log("Key pressed with code " + code);
-    if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
-    {
-        head.rotateY(rot);
-        headBBoxHelper.update();
-    }
-    else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
-    {
-        head.rotateY(-rot);
-        headBBoxHelper.update();
-    }
-    /* These alter how close you can get to the maze */
-    else if (code == 'w' || code == 'ArrowUp')
-    {
-        // if (checkWallCollisions(0, 0, -1.50) || checkWallCollisions(1.50, 0, 0) || checkWallCollisions(-1.50, 0, 0))
-        if (checkWallCollisions())
+    if(timeLeft >= 0) {
+        if (code === 'a' || code === 'ArrowLeft')           // 'a' and 'left arrow'
         {
-            for (let i = 0 ; i < 20; i++)
-            {
-                head.translateZ(0.10);
+            head.rotateY(rot);
+            headBBoxHelper.update();
+        } else if (code === 'd' || code === 'ArrowRight')     // 'd' and 'right arrow'
+        {
+            head.rotateY(-rot);
+            headBBoxHelper.update();
+        }
+        /* These alter how close you can get to the maze */
+        else if (code == 'w' || code == 'ArrowUp') {
+            // if (checkWallCollisions(0, 0, -1.50) || checkWallCollisions(1.50, 0, 0) || checkWallCollisions(-1.50, 0, 0))
+            if (checkWallCollisions()) {
+                for (let i = 0; i < 20; i++) {
+                    head.translateZ(0.10);
+                }
+            } else {
+                head.translateZ(-1);
             }
-        }
-        else 
-        {
-            head.translateZ(-1);
-        }
-    }
-    else if (code == 'q')
-    {
-        if (checkWallCollisions())
-        {
-            for (let i = 0 ; i < 5; i++)
-            {
-                head.translateZ(0.05);
+        } else if (code == 'q') {
+            if (checkWallCollisions()) {
+                for (let i = 0; i < 5; i++) {
+                    head.translateZ(0.05);
+                }
+            } else {
+                head.translateZ(-2);
             }
-        }
-        else 
+        } else if (code == '=') {
+            changeCamera();
+        } else if (code == 's' || code == 'ArrowDown') {
+            if (checkWallCollisions()) {
+                for (let i = 0; i < 20; i++)
+                    head.translateZ(-0.10);
+            } else {
+                head.translateZ(1);
+            }
+        } else if (code == 't')//to test the time addition if you collect a torch
         {
-            head.translateZ(-2);
+            totalTime += 10;
         }
-    }
-    else if (code == '=')
-    {
-        changeCamera();
-    }
-    else if (code == 's' || code == 'ArrowDown')
-    {    
-        if (checkWallCollisions())
-        {
-            for (let i = 0; i < 20; i++)
-                head.translateZ(-0.10);
-        }
-        else 
-        {
-            head.translateZ(1);
-        }
+
     }
 
 }
