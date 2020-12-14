@@ -168,19 +168,21 @@ function setSpawnPoints()
     endPoint.type = "end";
     p.push(endPoint);
 
-    // // Comment below out for a known exit testing
-    // let min = 0;
-    // let max = exitLocations.length;
-    // let num = Math.floor(Math.random() * (max - min) + min);
-    // endPoint.position.x = exitLocations[6][0];
-    // endPoint.position.z = exitLocations[6][1];
+    // Comment below out for a known exit testing
+    let min = 0;
+    let max = exitLocations.length;
+    let num = Math.floor(Math.random() * (max - min) + min);
+    endPoint.position.x = exitLocations[num][0];
+    endPoint.position.z = exitLocations[num][1];
 
-    // // The last 4 spawn locations of the 7 (3-6) need to be rotated 90 L or R
-    // if (num >= 3)
-    // {
-    //     endPoint.rotateY(Math.PI / 2);        
-    // }
+    // The last 4 spawn locations of the 7 (3-6) need to be rotated 90 L or R
+    if (num >= 3)
+    {
+        endPoint.rotateY(Math.PI / 2);        
+    }
 
+
+    
     // Rotates the head into any desired angle -> randomize for an extra challenge?
     head.position.x = -18;
     head.position.z = 15;
@@ -1123,6 +1125,13 @@ function doKeyDown( event )
         {
             totalTime -= 25;
             lightingSystem();
+        }
+        else if (code === ",")  // Move exit
+        {
+            console.log("Moving endpoint");
+            endPoint.position.z = 20;
+            endPoint.position.x = 0;
+            endPoint.rotateY(Math.PI);
         }
         else if (code == 's' || code == 'ArrowDown')
         {    
