@@ -15,11 +15,10 @@ let transY = 0;
 let transZ = -.005;
 let gameover = false;     // Controls the render
 let win = false;
-let handle;
 let camHelper;
 let audio;
 let hard;
-
+let score;
 
 // Possible torch spawn locations
 let torchLocations = [
@@ -53,6 +52,8 @@ let exitLocations = [
 
 let torch;                      //torch model (set as a single torch first)
 let flameRed, flameYell;
+let handle;
+let torchLight;
 
 let headBBoxHelper, headBBox;
 let walls = [];                 //used for checking wall collisions
@@ -682,6 +683,10 @@ function torchCreation()
     flameYell.rotation.z = -Math.sin(2);
     flameRed.position.y = 1.75;
 
+    torchLight = new THREE.PointLight(0xFC8704, 0.7, 10, 2);
+    torchLight.position.y = 2;
+    handle.add(torchLight);
+
     //doFlameRotation(flameRed);
     //doFlameRotation(flameRed);
 
@@ -875,6 +880,9 @@ function gameOverWin()
     collision = collision || 1;  // Make sure collisions is at least 1
     score = Math.ceil(timeLeft * (collision));
 
+    if(hard == true)
+        score *= 2;
+
     scoreText.innerHTML = "<strong>Score: <strong>" + score.toString();
 }   
 
@@ -902,7 +910,7 @@ function updateForFrame()
     if (gameStart)
     {
         let time = clock.getElapsedTime(); // time, in seconds, since clock was created
-        let timeFloor = Math.floor(time); //for testing timer going up
+        //let timeFloor = Math.floor(time); //for testing timer going up
         let timeCeiling = Math.ceil(time); //for the count down
         timeLeft = totalTime - timeCeiling
     }
