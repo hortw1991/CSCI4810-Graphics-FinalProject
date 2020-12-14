@@ -14,9 +14,10 @@ let rotXTheta = 0.01;
 let transY = 0;
 let transZ = -.005;
 let gameover = false;     // Controls the render
+let win = false;
 let handle;
 let camHelper;
-
+let audio;
 let hard;
 
 
@@ -37,6 +38,17 @@ let torchLocations = [
     [-25,-45]
 ]
 
+// Possible end locations
+let exitLocations = [
+    [48,-31],
+    [48,-33],
+    [-95, -85],
+    // Rotate 90 if index 3 -> 6 are picked
+    [63, 91],
+    [-55,42],
+    [-18, -21],
+    [40, -79],
+]
 
 
 
@@ -64,6 +76,8 @@ let brightness;
 
 function createWorld(diff)
 {
+    // Music and set difficulty
+    document.getElementById("music").play()
     hard = diff;
 
     renderer.setClearColor( 0 );  // black background
@@ -139,16 +153,30 @@ function createWorld(diff)
  */
 function setSpawnPoints()
 {
-    let g = new THREE.BoxGeometry(8, 20, 3);
+    let g = new THREE.BoxGeometry(8, 20, 2);
     let tex = new THREE.TextureLoader().load('./resources/cornentrance.jpg');
-
     let m = new THREE.MeshBasicMaterial({map:tex})
     endPoint = new THREE.Mesh(g, m);
     scene.add(endPoint);
+
+    // Non random exit location.
     endPoint.position.z = 20;
     endPoint.type = "end";
     p.push(endPoint);
+    // Comment below out for a known exit testing
+    let min = 0;
+    let max = exitLocations.length;
+    let num = Math.floor(Math.random() * (max - min) + min);
+    endPoint.position.x = exitLocations[6][0];
+    endPoint.position.z = exitLocations[6][1];
 
+    // The last 4 spawn locations of the 7 (3-6) need to be rotated 90 L or R
+    if (num >= 3)
+    {
+        endPoint.rotateY(Math.PI / 2);        
+    }
+
+    // Rotates the head into any desired angle -> randomize for an extra challenge?
     head.position.x = -18;
     head.position.z = 15;
     head.rotateY(Math.PI); 
@@ -778,7 +806,7 @@ function checkWallCollisions(rev=false)
                 {
                     console.log("end");
                     gameover = true;
-                    gameOverWin();
+                    win = true;
                 }
                 else if (collisions[0].object.type == "torch")
                 {
@@ -833,6 +861,21 @@ function gameOverWin()
 
 
 /**
+ * Displays a super spooky ghost for being too bad to beat the game.
+ */
+function gameOverLoss()
+{
+    let over = document.getElementById('gameover');
+    over.style.display = "block";
+    over.style.backgroundImage = "url(./resources/ghost.jpg)";
+    over.style.backgroundSize = "100% 100%";
+
+    // Invert the colors for a spook ghost
+}
+
+
+
+/**
  *  When an animation is in progress, this function is called just before rendering each
  *  frame of the animation.
  */
@@ -855,15 +898,9 @@ function updateForFrame()
     }
     else{
         document.getElementById("timeLeft").innerHTML = "Lights Out!"; 
+        gameover = true;
     }
 }
-
-
-/**
- * Changes the difficulty by switching the camera mode.
- */
-
-
 
 /**
  *  Render the scene.  This is called for each frame of the animation, after updating
@@ -1026,7 +1063,7 @@ function doKeyDown( event )
             else 
             {
                 head.translateZ(1);
-            }
+             }
         }
     }
 }
@@ -1047,7 +1084,18 @@ function doFrame()
 
     render();
     if (!gameover)
+    {
         requestAnimationFrame(doFrame);
+    } 
+    else if (win)
+    {
+        gameOverLoss();
+        // gameOverWin();
+    } 
+    else
+    {
+        gameOverLoss();
+    }
 }
 
 //----------------------- respond to window resizing -------------------------------
@@ -1103,7 +1151,9 @@ function init()
         start();
     });
 
-
+    // Let there be music
+    // audio = new Audio('./resources/halloween.mp3');
+    // audio.play();
 
     clock = new THREE.Clock(); // For keeping time during the animation.
     // start();

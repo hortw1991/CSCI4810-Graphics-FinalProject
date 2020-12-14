@@ -67,6 +67,13 @@
 	Escape the corn maze! <br>
 	Time Remaining: <span id="timeLeft">0</span><br>
 	Torches Collected: <span id="collected">0</span>
+	<span><br>
+		<audio id="music" src="./resources/halloween.mp3"></audio>
+		<div>
+			<button onclick="document.getElementById('music').play()">Play</button>
+			<button onclick="document.getElementById('music').pause()">Pause</button>
+			<button onclick="document.getElementById('music').muted=!document.getElementById('music').muted">Mute/ Unmute</button>
+		</div>
 </h3>
 
 </body>

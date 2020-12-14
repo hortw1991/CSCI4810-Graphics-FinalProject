@@ -31,6 +31,10 @@ https://unsplash.com/photos/bM9fCQCkWv4?utm_source=unsplash&utm_medium=referral&
 
 Photo by Ingmar on Unsplash
 
+"Ghost"
+
+Photo by Stefano Pollio on Unsplash
+
 All other textures required no attribution.
 
 ## TODOs
