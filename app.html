@@ -43,11 +43,25 @@
         margin: 0; z-index:10; min-width: 100%; min-height: 100%;
         color:white; border: thick solid gold; background-image: url(./resources/cornentrance.jpg); display: hidden; background-size: 100%" >
 			<div id="centered-good">
-				<h2>Enter the corn.  Easy or hard?</h2>
+				<h2>Enter the corn.</h2>
+				<h3>Collect torches to add daylight and find the exit.<h3>
 				<h3>There is no going back.</h3>
-				<button id="easybtn">Easy</button>
+				<br>
+				<button id="easybtn">Easy</button> - a more comfortable bigger field of view
 				<br><br>
-				<button id="hardbtn">Hard</button>
+				<button id="hardbtn">Hard</button> - a closer and disorienting view
+				<br><br>
+				<h3>Controls:</h3>
+				<ul>
+					<li><strong>wasd/Arrow Keys</strong> - move and turn</li>
+					<li><strong>q</strong> - sprint (while staming remains)</li>
+					<li><strong>shift + turn</strong> - sharp turn</li>
+				</ul>
+				<ul> (For Debugging / Demonstrating)
+					<li><strong>=</strong> - top down camera (does not reset)</li>
+					<li><strong>Mouse Click</strong> - logs point of contact between the camera->ground</li>
+					<li><strong>e or t</strong> - time remaining - 25s</li>
+				</ul>
 			</div>
         </div>
 
@@ -56,11 +70,15 @@
         margin: 0; z-index:10; min-width: 100%; min-height: 100%;
         color:white; border: thick solid black; display: none;" >
             <div id="centered">
-				<span id="text"><p>Sample Text<p></span>
+				<span id="endmsg"><p></p></span><br>
 				<span id="score"></span>
+				<br><br><br>
+				<button onclick="window.location.reload();">Play Again?</button>
             </div>
         </div>
 	</div>
+
+
 	<h3 style="position:fixed; top:5px; left:5px; padding:8px;
 	margin: 0; z-index:10; background-color:#32332A;
 	color:ghostwhite; border: thick solid ghostwhite; font-family:monospace">
@@ -74,7 +92,12 @@
 			<button onclick="document.getElementById('music').pause()">Pause</button>
 			<button onclick="document.getElementById('music').muted=!document.getElementById('music').muted">Mute/ Unmute</button>
 		</div>
-</h3>
+	</h3>
+	<h3 style="position:fixed; top:5px; right:5px; padding:8px;
+	margin: 0; z-index:10; background-color:#32332A;
+	color:ghostwhite; border: thick solid ghostwhite; font-family:monospace">
+		Stamina: <span id=stamina>100</span>
+	</h3>
 
 </body>
 </html>

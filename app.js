@@ -51,7 +51,6 @@ let exitLocations = [
 ]
 
 
-
 let torch;                      //torch model (set as a single torch first)
 let flameRed, flameYell;
 
@@ -68,10 +67,14 @@ let rot = Math.PI / 45;
 
 //used to tell if the game needs to stop or not
 let totalTime = 200;
-let timeLeft;
+let timeLeft = 1;
 //lighting
 let ambLight;                   //ambient lighting
 let brightness;
+let gameStart = false;          // Only starts the timer after the player has moved
+
+// Custom stamina bar - you have limited amount of sprinting
+let stamina = 100;
 
 
 function createWorld(diff)
@@ -159,22 +162,23 @@ function setSpawnPoints()
     endPoint = new THREE.Mesh(g, m);
     scene.add(endPoint);
 
-    // Non random exit location.
+    // // Non random exit location.
     endPoint.position.z = 20;
     endPoint.type = "end";
     p.push(endPoint);
-    // Comment below out for a known exit testing
-    let min = 0;
-    let max = exitLocations.length;
-    let num = Math.floor(Math.random() * (max - min) + min);
-    endPoint.position.x = exitLocations[6][0];
-    endPoint.position.z = exitLocations[6][1];
 
-    // The last 4 spawn locations of the 7 (3-6) need to be rotated 90 L or R
-    if (num >= 3)
-    {
-        endPoint.rotateY(Math.PI / 2);        
-    }
+    // // Comment below out for a known exit testing
+    // let min = 0;
+    // let max = exitLocations.length;
+    // let num = Math.floor(Math.random() * (max - min) + min);
+    // endPoint.position.x = exitLocations[6][0];
+    // endPoint.position.z = exitLocations[6][1];
+
+    // // The last 4 spawn locations of the 7 (3-6) need to be rotated 90 L or R
+    // if (num >= 3)
+    // {
+    //     endPoint.rotateY(Math.PI / 2);        
+    // }
 
     // Rotates the head into any desired angle -> randomize for an extra challenge?
     head.position.x = -18;
@@ -652,7 +656,8 @@ function torchCreation()
     handle.loc = 0;
 
     scene.add(handle);
-    handle.position.z = 10;
+    handle.position.x = -18;
+    handle.position.z = 21;
     handle.position.y = 5;
 
     const cubeWidth = 1;
@@ -774,8 +779,12 @@ function glowYellowShader()
  * Note: we need to check as if the player has already moved to prevent clipping
  *       INTO the wall by adding one to the length of the ray angle 
  */
-function checkWallCollisions(rev=false)
+function checkWallCollisions(sprint=0)
 {
+    // Amount forward to predict.  Normal walking is 1, but sprinting is 2
+    let predictAmt = sprint || 1;
+    console.log("Sprint: " , sprint, predictAmt);
+
     // Create the head pos and "predict" its next location
     let headPos = head.position.clone();
 
@@ -794,7 +803,7 @@ function checkWallCollisions(rev=false)
         // Check if the the collision is TOUCHING the actual wall (or less)
         if (collisions.length > 0)
         {
-            if (collisions[0].distance < rayAngle.length() + 1)
+            if (collisions[0].distance < rayAngle.length() + predictAmt)
             {
                 if (collisions[0].object.type == "wall")
                 {
@@ -805,6 +814,7 @@ function checkWallCollisions(rev=false)
                 else if (collisions[0].object.type == "end")
                 {
                     console.log("end");
+                    // gameOverWin();
                     gameover = true;
                     win = true;
                 }
@@ -852,12 +862,21 @@ function checkCameraRot(rot)
  */
 function gameOverWin()
 {
-    let over = document.getElementById('gameover')
+    let over = document.getElementById('gameover');
     over.style.display = "block";
-    over.style.backgroundImage = "url(./resources/endscreen.jpg)"
+    over.style.backgroundImage = "url(./resources/endscreen.jpg)";
     over.style.backgroundSize = "100% 100%";
-    
-}
+
+    // Display victor text
+    document.getElementById('endmsg').innerHTML = "You escaped...this time."
+ 
+    // Calculate and display score
+    let scoreText = document.getElementById('score');
+    collision = collision || 1;  // Make sure collisions is at least 1
+    score = Math.ceil(timeLeft * (collision));
+
+    scoreText.innerHTML = "<strong>Score: <strong>" + score.toString();
+}   
 
 
 /**
@@ -870,7 +889,6 @@ function gameOverLoss()
     over.style.backgroundImage = "url(./resources/ghost.jpg)";
     over.style.backgroundSize = "100% 100%";
 
-    // Invert the colors for a spook ghost
 }
 
 
@@ -881,10 +899,13 @@ function gameOverLoss()
  */
 function updateForFrame()
 {
-    let time = clock.getElapsedTime(); // time, in seconds, since clock was created
-    let timeFloor = Math.floor(time); //for testing timer going up
-    let timeCeiling = Math.ceil(time); //for the count down
-    timeLeft = totalTime - timeCeiling
+    if (gameStart)
+    {
+        let time = clock.getElapsedTime(); // time, in seconds, since clock was created
+        let timeFloor = Math.floor(time); //for testing timer going up
+        let timeCeiling = Math.ceil(time); //for the count down
+        timeLeft = totalTime - timeCeiling
+    }
 
     /**
      * For this section this is where we are going transfer
@@ -992,8 +1013,21 @@ function doMouseMove(evt)
 }
 
 
+// Decrements stamina (if needed and updates the display)
+function decrementStamina()
+{
+    if (stamina <= 0) return;  // No stam left
+    stamina -= 2.5;
+    let stam = document.getElementById("stamina");
+    stam.innerHTML = stamina.toString();
+
+}
+
 function doKeyDown( event )
 {
+    // Start the game after assets have loaded and the player can move
+    gameStart = true;
+
     // let fn = "[doKeyDown]: ";
     // console.log( fn + "Key pressed with code " + event.key );
     // https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
@@ -1006,13 +1040,29 @@ function doKeyDown( event )
         // console.log("Key pressed with code " + code);
         if( code === 'a' || code === 'ArrowLeft' )           // 'a' and 'left arrow'
         {
-            if (hard) checkCameraRot(rot);
-            head.rotateY(rot);
+            if (event.shiftKey) 
+            {
+                if (hard) checkCameraRot(Math.PI/2);
+                head.rotateY(Math.PI/2);
+            }
+            else
+            {
+                if (hard) checkCameraRot(rot);
+                head.rotateY(rot);
+            }
         }
         else if( code === 'd' || code === 'ArrowRight' )     // 'd' and 'right arrow'
         {
-            if (hard) checkCameraRot(-rot);
-            head.rotateY(-rot);
+            if (event.shiftKey) 
+            {
+                if (hard) checkCameraRot(-Math.PI/2);
+                head.rotateY(-Math.PI/2);
+            }
+            else
+            {
+                if (hard) checkCameraRot(-rot);
+                head.rotateY(-rot);
+            }
         }
         /* These alter how close you can get to the maze */
         else if (code == 'w' || code == 'ArrowUp')
@@ -1022,35 +1072,48 @@ function doKeyDown( event )
             {
                 for (let i = 0 ; i < 20; i++)
                 {
-                    head.translateZ(0.20);
+                    head.translateZ(0.30);
                 }
             }
             else 
             {
                 if (hard) camera.position.set(0, 1.7, 10);
-                head.translateZ(-1);
+                head.translateZ(-1.25);
             }
         }
-        else if (code == 'q')
+        else if (code == 'q')   // Sprint!  Drains stamina
         {
-            if (checkWallCollisions())
+
+            // Check if we can sprint and make sure we aren't sprinting into a wall
+            if (stamina > 0)
             {
-                for (let i = 0 ; i < 5; i++)
+                if (checkWallCollisions(3))
                 {
-                    head.translateZ(0.05);
+                    for (let i = 0 ; i < 20; i++)
+                    {
+                        head.translateZ(0.30);
+                    }
+                }
+                else 
+                {
+                    // See if we can move, and decrement stamina
+                    decrementStamina();
+
+                    head.translateZ(-3.0);
                 }
             }
-            else 
+            else
             {
-                head.translateZ(-2);
+                // Could add effects to show we can't sprint
             }
         }
-        else if (code == '=')
+        else if (code == '=') // Demo camera
         {
             changeCamera();
         }
-        else if (code =="t" || code == "e")
+        else if (code =="t" || code == "e") // Demo lighting
         {
+            totalTime -= 25;
             lightingSystem();
         }
         else if (code == 's' || code == 'ArrowDown')
@@ -1058,7 +1121,7 @@ function doKeyDown( event )
             if (checkWallCollisions())
             {
                 for (let i = 0; i < 20; i++)
-                    head.translateZ(-0.20);
+                    head.translateZ(-0.30);
             }
             else 
             {
@@ -1089,8 +1152,8 @@ function doFrame()
     } 
     else if (win)
     {
-        gameOverLoss();
-        // gameOverWin();
+        // gameOverLoss();  // For easy loss testing
+        gameOverWin();
     } 
     else
     {
@@ -1138,6 +1201,7 @@ function init()
 
     window.addEventListener( 'resize', doResize );  // Set up handler for resize event
     document.addEventListener("keydown",doKeyDown);
+    // document.addEventListener("keyup", doKeyUp);
     window.addEventListener(    "mousedown",doMouseDown );
     window.addEventListener(    "mousemove",doMouseMove );
     document.getElementById('easybtn').addEventListener('click', () => {

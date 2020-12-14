@@ -69,14 +69,15 @@ canvas {
     width: 75%;
     height: 50%;
     top: 25%;
-    left: 40%;
+    left: 50%;
+    right: 50%;
     margin-left: -50px; /* margin is -0.5 * dimension */
     margin-top: -25px; 
     font-size: 100%;
-    animation-name: 'fontGrow';
+    /* animation-name: 'fontGrow';
     animation-iteration-count: 1;
     animation-duration: 5s;
-    animation-timing-function: ease;
+    animation-timing-function: ease; */
 }
 
 
