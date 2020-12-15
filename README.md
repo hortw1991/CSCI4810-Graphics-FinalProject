@@ -1,5 +1,18 @@
 # CSCI4810-Graphics-FinalProject
 
+Thomas Horn & Patrick Feltey
+
+## Full Presentation
+
+Our unabridged 15 minutes presentation can be seen at the following link:
+
+https://www.youtube.com/watch?v=Ejb4g7axAtg
+
+Our slides can be seen at the following link and our included in this repository:
+
+https://outlookuga-my.sharepoint.com/:p:/g/personal/ptf65183_uga_edu/ETXEnc3QpgtGsZAEH_sAUhEBA1SICwqc8UphAtMJMgfeIA?e=ghfHSj
+
+
 ## References
 
 Bounding Box Collision Detection:
@@ -46,11 +59,11 @@ All other textures required no attribution.
 - [x] Implement maze design
 - [x] Wall textures
 - [x] Score keeping
-- [ ] Loss scenario and screen
+- [X] Loss scenario and screen
 - [X] Win scenario and screen
 - [x] ThreeJS transitions to matrices
 - [X] Torch bounding box / raycasting with collision
 - [X] Torch hovering
 - [X] Fix camera angle
-- [ ] Rebind sprint key - stamina
+- [X] Rebind sprint key - stamina
 - [x] Make floor look cool
