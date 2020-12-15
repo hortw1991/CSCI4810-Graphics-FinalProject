@@ -854,12 +854,11 @@ function checkCameraRot(rot)
                 console.log("camlission");
                 camera.position.set(0, 1.5, 5);
             }
-
         } 
         else
-            {
-                camera.position.set(0, 1.7, 10);
-            }
+        {
+            camera.position.set(0, 1.7, 10);
+        }
     }
 }
 
