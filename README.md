@@ -28,13 +28,10 @@ https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 
 RayCasting Collision Detection
 
-How to get the distance to the ray and collision
-
 https://codepen.io/bartuc/pen/JLzRwY?editors=0010
  
 https://stackoverflow.com/questions/25697327/three-js-accurate-ray-casting-for-collision-detection
 
-=======
 Ground Textures:
 
 https://www.deviantart.com/shadowh3/art/Rock-Ground-73682465
