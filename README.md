@@ -2,6 +2,13 @@
 
 Thomas Horn & Patrick Feltey
 
+## Introduction
+
+This final project is a video game maze that implements all techniques learned in CSCI4810 Graphics as well as independently learned techniques.
+
+Although this project includes things such as raycasting, custom shaders, manual matrix translations/transpositions, the main goal of the project was to use
+vanilla THREEJS to create a raycasting based collision system to constrain our player within the maze, rather than rely on a physics or collision system dependency.  
+
 ## Full Presentation
 
 Our unabridged 15 minutes presentation can be seen at the following link:
